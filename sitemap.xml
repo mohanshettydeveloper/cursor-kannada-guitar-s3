@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+    <url>
+        <loc>https://kannadaguitar.com/</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://kannadaguitar.com/images/kannada-guitar-home.jpg</image:loc>
+            <image:title>Kannada Guitar Community - Learn Guitar in Kannada</image:title>
+            <image:caption>Join the largest Kannada Guitar community for guitar lessons, tutorials, and music sharing in Kannada language</image:caption>
+        </image:image>
+    </url>
+    <url>
+        <loc>https://kannadaguitar.com/about.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://kannadaguitar.com/images/kannada-guitar-about.jpg</image:loc>
+            <image:title>About Kannada Guitar Community</image:title>
+            <image:caption>Learn about our mission to promote guitar learning in Kannada language</image:caption>
+        </image:image>
+    </url>
+    <url>
+        <loc>https://kannadaguitar.com/contact.html</loc>
+        <lastmod>2024-01-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+        <image:image>
+            <image:loc>https://kannadaguitar.com/images/kannada-guitar-contact.jpg</image:loc>
+            <image:title>Contact Kannada Guitar Community</image:title>
+            <image:caption>Get in touch with our Kannada guitar community for support and collaboration</image:caption>
+        </image:image>
+    </url>
+</urlset>

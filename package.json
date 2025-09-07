@@ -1,0 +1,38 @@
+{
+  "name": "kannada-guitar-website",
+  "version": "1.0.0",
+  "description": "A platform for Kannadigas to share their guitar talent and contribute to growing Kannada music",
+  "main": "index.html",
+  "scripts": {
+    "deploy": "./deploy.sh",
+    "test": "echo \"No tests specified\" && exit 0",
+    "build": "echo \"No build process needed for static site\" && exit 0"
+  },
+  "keywords": [
+    "kannada",
+    "guitar",
+    "music",
+    "community",
+    "blog",
+    "website",
+    "s3",
+    "static-site"
+  ],
+  "author": "Kannada Guitar Community",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/kannada-guitar-website.git"
+  },
+  "homepage": "https://kannadaguitar.com",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

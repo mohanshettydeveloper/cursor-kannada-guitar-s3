@@ -1,0 +1,38 @@
+User-agent: *
+Allow: /
+
+# Sitemap for Kannada Guitar Community
+Sitemap: https://kannadaguitar.com/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1
+
+# Disallow admin areas (if any)
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+
+# Allow all main content
+Allow: /index.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /error.html
+Allow: /post-template.html
+Allow: /styles.css
+Allow: /script.js
+Allow: /*.html
+
+# Allow images for better SEO
+Allow: /images/
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.webp
+
+# Allow CSS and JS files
+Allow: /*.css
+Allow: /*.js
+
+# Host information
+Host: https://kannadaguitar.com
