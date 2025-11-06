@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Kannada Guitar Community</title>
+    <link rel="icon" type="image/png" href="guitar_black.PNG">
+    <link rel="apple-touch-icon" href="guitar_black.PNG">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="View your profile on Kannada Guitar Community. Manage your account information and preferences.">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <div class="music-icon">🎸</div>
+                        <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
+                    </div>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="main-nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li class="nav-dropdown">
+                            <a href="index.html#posts" class="nav-link">Posts ▼</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="index.html#posts" class="dropdown-link">View All Posts</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="about.html" class="nav-link">About</a></li>
+                        <li><a href="contact.html" class="nav-link">Contact</a></li>
+                        <li class="nav-dropdown account-dropdown">
+                            <a href="#" class="nav-link">Account ▼</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="profile.html" class="dropdown-link active">👤 Profile</a></li>
+                                <li><a href="#" class="dropdown-link" onclick="event.preventDefault(); logout(); return false;">🚪 Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
+                        <button class="search-btn" onclick="window.location.href='index.html'">🔍</button>
+                    </div>
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="profile-section">
+                <div class="profile-container">
+                    <h2 class="profile-title">My Profile</h2>
+                    <p class="profile-subtitle">Manage your account information and preferences</p>
+                    
+                    <div id="profileContent" class="profile-content">
+                        <!-- Profile content will be loaded here -->
+                        <div class="profile-loading">
+                            <p>Loading profile...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Kannada Guitar</h3>
+                    <p>A platform for all Kannadigas to share their guitar talent and contribute to growing Kannada music.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#posts">All Posts</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="profile.html">My Profile</a></li>
+                        <li><a href="contact.html">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Kannada Guitar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+                document.querySelector('.theme-toggle').textContent = '🌙';
+            } else {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+        }
+
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        });
+
+        // Load and display user profile
+        async function loadUserProfile() {
+            const profileContent = document.getElementById('profileContent');
+            
+            // Check if user is logged in
+            if (typeof isLoggedIn === 'function') {
+                const loggedIn = await isLoggedIn();
+                if (!loggedIn) {
+                    // User not logged in, redirect to login
+                    profileContent.innerHTML = `
+                        <div class="profile-error">
+                            <h3>Please Login</h3>
+                            <p>You need to be logged in to view your profile.</p>
+                            <a href="login.html" class="btn-primary">Go to Login</a>
+                        </div>
+                    `;
+                    return;
+                }
+            } else {
+                // Fallback: check localStorage directly
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    profileContent.innerHTML = `
+                        <div class="profile-error">
+                            <h3>Please Login</h3>
+                            <p>You need to be logged in to view your profile.</p>
+                            <a href="login.html" class="btn-primary">Go to Login</a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
+            // Get user information
+            let user;
+            if (typeof getCurrentUser === 'function') {
+                user = await getCurrentUser();
+            } else {
+                // Fallback: get from localStorage
+                try {
+                    user = JSON.parse(localStorage.getItem('currentUser'));
+                } catch (e) {
+                    user = null;
+                }
+            }
+
+            if (!user) {
+                profileContent.innerHTML = `
+                    <div class="profile-error">
+                        <h3>Error Loading Profile</h3>
+                        <p>Unable to load your profile information. Please try logging in again.</p>
+                        <a href="login.html" class="btn-primary">Go to Login</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display profile information
+            const memberSince = user.loginTime || user.registeredAt || new Date().toISOString();
+            const memberSinceDate = new Date(memberSince).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            profileContent.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <span class="avatar-icon">👤</span>
+                        </div>
+                        <div class="profile-header-info">
+                            <h3>${user.fullName || user.username || 'User'}</h3>
+                            <p class="profile-username">@${user.username}</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-details">
+                        <div class="profile-detail-section">
+                            <h4>📧 Contact Information</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">${user.email || 'Not provided'}</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-detail-section">
+                            <h4>📍 Location & Experience</h4>
+                            ${user.location ? `
+                            <div class="detail-item">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value">${user.location}</span>
+                            </div>
+                            ` : ''}
+                            ${user.experience ? `
+                            <div class="detail-item">
+                                <span class="detail-label">Guitar Experience:</span>
+                                <span class="detail-value">${user.experience.charAt(0).toUpperCase() + user.experience.slice(1)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="profile-detail-section">
+                            <h4>📅 Account Information</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Member Since:</span>
+                                <span class="detail-value">${memberSinceDate}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">User ID:</span>
+                                <span class="detail-value">${user.id || user.sub || user.username}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <a href="index.html" class="btn-secondary">Back to Home</a>
+                        <a href="contact.html" class="btn-secondary">Contact Support</a>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎸</div>
+                        <div class="stat-info">
+                            <h4>Community Member</h4>
+                            <p>Active member of Kannada Guitar Community</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <h4>Share Your Music</h4>
+                            <p>Create posts and share your guitar journey</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load profile when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for auth scripts to load
+            setTimeout(() => {
+                loadUserProfile();
+            }, 200);
+        });
+    </script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        // Make logout function available
+        if (typeof logout !== 'function') {
+            window.logout = function() {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            };
+        }
+    </script>
+</body>
+</html>
+

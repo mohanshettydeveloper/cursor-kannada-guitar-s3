@@ -1,0 +1,105 @@
+<!-- 
+    EXAMPLE: Login Page with AWS Cognito Integration
+    This shows how to update login.html to use AWS Cognito
+    
+    Replace the login form handler in login.html with this code
+-->
+
+<script>
+// Login form handling with AWS Cognito
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!checkLoginRateLimit()) {
+        return;
+    }
+
+    const formData = new FormData(this);
+    
+    if (!validateLoginForm(formData)) {
+        return;
+    }
+
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    loginFormSubmissionCount++;
+    lastLoginSubmissionTime = Date.now();
+
+    const username = formData.get('username').trim();
+    const password = formData.get('password');
+    const rememberMe = formData.get('rememberMe');
+
+    try {
+        // Login with AWS Cognito
+        const result = await loginUser(username, password, rememberMe);
+        
+        // Get user details
+        const user = await getCurrentUser();
+        
+        if (user) {
+            showSuccessMessage('Login successful! Welcome back!');
+            
+            // Update navigation
+            updateNavigation();
+            
+            // Redirect to home page
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        } else {
+            throw new Error('Failed to get user details');
+        }
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        
+        // Handle special cases
+        if (error.code === 'NewPasswordRequired') {
+            // User needs to set a new password (first-time login)
+            sessionStorage.setItem('newPasswordRequired', 'true');
+            sessionStorage.setItem('username', username);
+            showErrorMessage('New password required. Please set a new password.');
+            // Redirect to change password page or show modal
+            setTimeout(() => {
+                window.location.href = 'change-password.html';
+            }, 2000);
+        } else {
+            const errorMessage = getCognitoErrorMessage(error);
+            showErrorMessage(errorMessage);
+            generateLoginCaptcha();
+        }
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+    }
+});
+
+// Forgot password handler
+async function handleForgotPassword() {
+    const username = document.getElementById('loginUsername').value.trim();
+    if (!username) {
+        showErrorMessage('Please enter your username or email.');
+        return;
+    }
+    
+    try {
+        await forgotPassword(username);
+        showSuccessMessage('Password reset code sent to your email. Please check your inbox.');
+        // Redirect to password reset page
+        sessionStorage.setItem('passwordResetUsername', username);
+        setTimeout(() => {
+            window.location.href = 'reset-password.html';
+        }, 2000);
+    } catch (error) {
+        const errorMessage = getCognitoErrorMessage(error);
+        showErrorMessage(errorMessage);
+    }
+}
+
+// Update the "Forgot password" link to use this function
+// In login.html, update the forgot password link:
+// <a href="#" onclick="event.preventDefault(); handleForgotPassword(); return false;">Forgot password? Contact support</a>
+</script>
+

@@ -46,16 +46,32 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo-section">
-                    <h1 class="blog-title">Kannada Guitar</h1>
-                    <p class="blog-subtitle">ಕನ್ನಡ ಗಿಟಾರ್</p>
+                    <div class="logo-container">
+                        <div class="music-icon">🎸</div>
+                        <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
+                    </div>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
                 </div>
                 
-                <nav class="main-nav">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="main-nav" id="mainNav">
                     <ul class="nav-list">
                         <li><a href="index.html" class="nav-link">Home</a></li>
                         <li><a href="index.html#posts" class="nav-link">Posts</a></li>
                         <li><a href="about.html" class="nav-link">About</a></li>
                         <li><a href="contact.html" class="nav-link active">Contact</a></li>
+                        <li class="nav-dropdown account-dropdown">
+                            <a href="#" class="nav-link">Account ▼</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="login.html" class="dropdown-link">🔐 Login</a></li>
+                                <li><a href="register.html" class="dropdown-link">📝 Register</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
                 
@@ -91,24 +107,6 @@
                                         <a href="mailto:kannadaguitarcom@gmail.com" class="email-link">Send Email</a>
                                     </div>
                                 </div>
-                                
-                                <div class="contact-method">
-                                    <div class="contact-icon">🌐</div>
-                                    <div class="contact-details">
-                                        <h4>Website</h4>
-                                        <p>kannadaguitar.com</p>
-                                        <a href="#" class="website-link">Visit Site</a>
-                                    </div>
-                                </div>
-                                
-                                <div class="contact-method">
-                                    <div class="contact-icon">🎸</div>
-                                    <div class="contact-details">
-                                        <h4>Community</h4>
-                                        <p>Join our guitar community</p>
-                                        <a href="index.html" class="community-link">Join Now</a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         
@@ -142,14 +140,6 @@
                                 <div class="form-group">
                                     <label for="contactMessage">Message *</label>
                                     <textarea id="contactMessage" name="message" rows="6" required placeholder="Tell us about your guitar journey, ask questions, or share your thoughts..."></textarea>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="newsletter" name="newsletter">
-                                        <span class="checkmark"></span>
-                                        Subscribe to our newsletter for guitar tips and community updates
-                                    </label>
                                 </div>
                                 
                                 <!-- Honeypot field (hidden from users) -->
@@ -429,14 +419,12 @@
             const email = formData.get('email');
             const subject = formData.get('subject');
             const message = formData.get('message');
-            const newsletter = formData.get('newsletter') ? 'Yes' : 'No';
             
             // Create mailto link with form data
             const mailtoLink = `mailto:kannadaguitarcom@gmail.com?subject=${encodeURIComponent(subject + ' - Contact from ' + name)}&body=${encodeURIComponent(
                 `Name: ${name}\n` +
                 `Email: ${email}\n` +
-                `Subject: ${subject}\n` +
-                `Newsletter Subscription: ${newsletter}\n\n` +
+                `Subject: ${subject}\n\n` +
                 `Message:\n${message}\n\n` +
                 `---\n` +
                 `This message was sent from the Kannada Guitar contact form.\n` +
@@ -540,5 +528,7 @@ By using this form, you agree to these terms and confirm your inquiry is legitim
             }, 5000);
         }
     </script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
 </body>
 </html>

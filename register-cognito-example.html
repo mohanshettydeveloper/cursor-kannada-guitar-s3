@@ -1,0 +1,180 @@
+<!-- 
+    EXAMPLE: Registration Page with AWS Cognito Integration
+    This shows how to update register.html to use AWS Cognito
+    
+    Replace the registration form handler in register.html with this code
+-->
+
+<script>
+// Registration form handling with AWS Cognito
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Check rate limit (keep your existing rate limiting)
+    if (!checkRateLimit()) {
+        return;
+    }
+
+    const formData = new FormData(this);
+    
+    // Validate form (keep your existing validation)
+    if (!validateForm(formData)) {
+        return;
+    }
+
+    // Disable submit button
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating Account...';
+
+    // Update rate limiting
+    formSubmissionCount++;
+    lastSubmissionTime = Date.now();
+
+    // Collect user data
+    const userData = {
+        fullName: formData.get('fullName').trim(),
+        email: formData.get('email').trim(),
+        username: formData.get('username').trim(), // Use email as username, or username field
+        password: formData.get('password'),
+        location: formData.get('location').trim(),
+        experience: formData.get('experience')
+    };
+
+    try {
+        // Register user with AWS Cognito
+        const result = await registerUser(userData);
+        
+        // Check if email verification is required
+        if (result.user && result.userConfirmed === false) {
+            // Email verification required
+            showSuccessMessage('Registration successful! Please check your email for verification code.');
+            
+            // Store username for verification
+            sessionStorage.setItem('pendingVerificationUsername', userData.username);
+            
+            // Redirect to verification page or show verification form
+            setTimeout(() => {
+                // Option 1: Redirect to verification page
+                // window.location.href = 'verify-email.html';
+                
+                // Option 2: Show verification modal/form
+                showVerificationModal(userData.username);
+            }, 2000);
+        } else {
+            // User is auto-confirmed (if configured in Cognito)
+            // Auto-login
+            await loginUser(userData.username, userData.password);
+            showSuccessMessage('Registration successful! Welcome to Kannada Guitar Community!');
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        // Reset form
+        this.reset();
+        generateCaptcha();
+        formStartTime = Date.now();
+        document.getElementById('formStartTime').value = formStartTime;
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        const errorMessage = getCognitoErrorMessage(error);
+        showErrorMessage(errorMessage);
+        generateCaptcha();
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+    }
+});
+
+// Email verification handler
+async function verifyUserEmail(username, verificationCode) {
+    try {
+        await verifyEmail(username, verificationCode);
+        showSuccessMessage('Email verified successfully! Logging you in...');
+        
+        // Clear pending verification
+        sessionStorage.removeItem('pendingVerificationUsername');
+        
+        // Get password from form (you might want to store this temporarily)
+        // For security, you may want to prompt user to login after verification
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+        
+        return true;
+    } catch (error) {
+        const errorMessage = getCognitoErrorMessage(error);
+        showErrorMessage(errorMessage);
+        return false;
+    }
+}
+
+// Resend verification code
+async function resendVerification() {
+    const username = sessionStorage.getItem('pendingVerificationUsername');
+    if (!username) {
+        showErrorMessage('No pending verification found.');
+        return;
+    }
+    
+    try {
+        await resendVerificationCode(username);
+        showSuccessMessage('Verification code resent! Please check your email.');
+    } catch (error) {
+        const errorMessage = getCognitoErrorMessage(error);
+        showErrorMessage(errorMessage);
+    }
+}
+
+// Show verification modal (if you want inline verification)
+function showVerificationModal(username) {
+    // Create modal HTML
+    const modalHTML = `
+        <div id="verificationModal" class="modal-overlay" style="display: flex;">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Verify Your Email</h2>
+                    <button class="modal-close" onclick="closeVerificationModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>We've sent a verification code to your email. Please enter it below.</p>
+                    <form id="verificationForm">
+                        <div class="form-group">
+                            <label for="verificationCode">Verification Code *</label>
+                            <input type="text" id="verificationCode" name="code" required 
+                                   placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-secondary" onclick="closeVerificationModal()">Cancel</button>
+                            <button type="submit" class="btn-primary">Verify Email</button>
+                        </div>
+                        <button type="button" class="btn-link" onclick="resendVerification()" 
+                                style="margin-top: 1rem; background: none; border: none; color: #ff6b35; cursor: pointer;">
+                            Resend Code
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Handle verification form submission
+    document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const code = document.getElementById('verificationCode').value;
+        await verifyUserEmail(username, code);
+    });
+}
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+</script>
+

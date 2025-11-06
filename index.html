@@ -8,6 +8,123 @@
     <link rel="apple-touch-icon" href="guitar_black.PNG">
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Critical functions for modal - must be defined before HTML uses them -->
+    <script>
+        // Define modal functions immediately so they're available for inline onclick handlers
+        function openAddPostModal() {
+            try {
+                const modal = document.getElementById('addPostModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Generate CAPTCHA if function is available
+                    if (typeof generateSecureCaptcha === 'function') {
+                        generateSecureCaptcha();
+                    }
+                    
+                    // Focus on first input
+                    setTimeout(() => {
+                        const firstInput = document.getElementById('securePostTitle');
+                        if (firstInput) firstInput.focus();
+                    }, 100);
+                } else {
+                    console.error('Modal not found');
+                }
+            } catch (error) {
+                console.error('Error opening modal:', error);
+            }
+        }
+        
+        function closeAddPostModal() {
+            const modal = document.getElementById('addPostModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease-in';
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    modal.style.display = 'none';
+                    modal.style.animation = '';
+                    document.body.style.overflow = 'auto';
+                    
+                    const form = document.getElementById('securePostForm');
+                    if (form) {
+                        form.reset();
+                        if (typeof generateSecureCaptcha === 'function') {
+                            generateSecureCaptcha();
+                        }
+                    }
+                }, 300);
+            }
+        }
+        
+        function generateSecureCaptcha() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            // Store in both window and local variable for compatibility
+            window.secureCaptchaCode = code;
+            if (typeof secureCaptchaCode !== 'undefined') {
+                secureCaptchaCode = code;
+            }
+            
+            const captchaDisplay = document.getElementById('secureCaptchaDisplay');
+            if (captchaDisplay) {
+                captchaDisplay.textContent = code;
+                captchaDisplay.style.background = `linear-gradient(45deg, #${Math.floor(Math.random()*16777215).toString(16)}, #${Math.floor(Math.random()*16777215).toString(16)})`;
+                captchaDisplay.style.color = '#fff';
+                captchaDisplay.style.fontWeight = 'bold';
+                captchaDisplay.style.letterSpacing = '3px';
+                captchaDisplay.style.padding = '0.5rem';
+                captchaDisplay.style.borderRadius = '5px';
+                captchaDisplay.style.minWidth = '120px';
+                captchaDisplay.style.textAlign = 'center';
+            }
+        }
+        
+        function showPostTerms() {
+            const termsContent = `Kannada Guitar Post Creation - Terms and Conditions
+
+1. CONTENT GUIDELINES
+   - Posts must be related to guitar, music, or Kannada culture
+   - No spam, advertisements, or promotional content
+   - Respectful and appropriate language is required
+   - Original content is encouraged
+
+2. COPYRIGHT
+   - You must own the rights to any content you post
+   - YouTube videos must be your own or properly attributed
+   - No copyrighted material without permission
+
+3. COMMUNITY STANDARDS
+   - Be respectful to other community members
+   - No harassment, hate speech, or inappropriate content
+   - Constructive feedback and support encouraged
+
+4. SECURITY
+   - This form includes anti-spam protection
+   - Rate limiting applies to prevent abuse
+   - All submissions are monitored for security
+
+5. MODERATION
+   - Posts may be reviewed before publication
+   - Inappropriate content will be removed
+   - Repeat violations may result in restrictions
+
+By creating a post, you agree to these terms and confirm your content is appropriate for the Kannada Guitar community.`;
+            alert(termsContent);
+        }
+        
+        // Make functions available on window object
+        window.openAddPostModal = openAddPostModal;
+        window.closeAddPostModal = closeAddPostModal;
+        window.generateSecureCaptcha = generateSecureCaptcha;
+        window.showPostTerms = showPostTerms;
+    </script>
+    
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
     
@@ -88,23 +205,36 @@
                         <div class="music-icon">🎸</div>
                         <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
                     </div>
-                    <p class="blog-subtitle">Kannada Guitar - Learn Guitar in Kannada Language</p>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
                 </div>
                 
-                <nav class="main-nav">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="main-nav" id="mainNav">
                     <ul class="nav-list">
                         <li><a href="#home" class="nav-link active">Home</a></li>
                         <li class="nav-dropdown">
                             <a href="#home" class="nav-link">Posts ▼</a>
                             <ul class="dropdown-menu">
                                 <li><a href="#home" class="dropdown-link">View All Posts</a></li>
-                                <li><a href="#" class="dropdown-link" onclick="openAddPostModal()">Add New Post</a></li>
+                                <li><a href="#" class="dropdown-link" onclick="event.preventDefault(); openAddPostModal(); return false;">Add New Post</a></li>
                                 <li class="dropdown-separator"></li>
                                 <li class="dropdown-section-title">Recent Posts</li>
                             </ul>
                         </li>
                         <li><a href="about.html" class="nav-link">About</a></li>
                         <li><a href="contact.html" class="nav-link">Contact</a></li>
+                        <li class="nav-dropdown account-dropdown">
+                            <a href="#" class="nav-link">Account ▼</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="login.html" class="dropdown-link">🔐 Login</a></li>
+                                <li><a href="register.html" class="dropdown-link">📝 Register</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
                 
@@ -294,7 +424,7 @@
                         <label class="checkbox-label">
                             <input type="checkbox" id="secureTerms" name="terms" required>
                             <span class="checkmark"></span>
-                            I agree to the <a href="#" onclick="showPostTerms()">Terms and Conditions</a> and confirm this is legitimate content
+                            I agree to the <a href="#" onclick="event.preventDefault(); showPostTerms(); return false;">Terms and Conditions</a> and confirm this is legitimate content
                         </label>
                     </div>
                     
@@ -338,7 +468,7 @@
                 <div class="footer-section">
                     <h4>Features</h4>
                     <ul class="footer-links">
-                        <li><a href="#" onclick="openAddPostModal()">Create Post</a></li>
+                        <li><a href="#" onclick="event.preventDefault(); openAddPostModal(); return false;">Create Post</a></li>
                         <li><a href="#" onclick="scrollToPosts()">Video Posts</a></li>
                         <li><a href="#" onclick="scrollToPosts()">Browse by Tags</a></li>
                         <li><a href="#" onclick="focusSearchInput()">Search</a></li>
@@ -363,13 +493,6 @@
                     </div>
                 </div>
                 
-                <div class="footer-section">
-                    <h4>Support Us</h4>
-                    <p>Help us grow the Kannada guitar community!</p>
-                    <div class="support-actions">
-                        <button class="support-btn" onclick="openDonationModal()">💝 Donate</button>
-                    </div>
-                </div>
             </div>
             
             <div class="footer-bottom">
@@ -382,42 +505,11 @@
         </div>
     </footer>
 
-    <!-- Donation Modal -->
-    <div id="donationModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>💝 Support Kannada Guitar</h2>
-                <button class="modal-close" onclick="closeDonationModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>Help us maintain and grow the Kannada guitar community. Your support helps us:</p>
-                <ul>
-                    <li>Keep the website running smoothly</li>
-                    <li>Add new features and improvements</li>
-                    <li>Support Kannada musicians and content creators</li>
-                    <li>Organize community events and workshops</li>
-                </ul>
-                <div class="donation-options">
-                    <button class="donation-btn" onclick="processDonation(100)">₹100</button>
-                    <button class="donation-btn" onclick="processDonation(500)">₹500</button>
-                    <button class="donation-btn" onclick="processDonation(1000)">₹1000</button>
-                    <button class="donation-btn" onclick="processDonation(0)">Custom Amount</button>
-                </div>
-                <div class="payment-methods">
-                    <h4>Payment Methods:</h4>
-                    <div class="payment-options">
-                        <button class="payment-btn" onclick="openUPI()">📱 UPI</button>
-                        <button class="payment-btn" onclick="openBankTransfer()">🏦 Bank Transfer</button>
-                        <button class="payment-btn" onclick="openPayPal()">💳 PayPal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
     <script src="script.js"></script>
     <script>
+        
         // Initialize AdSense ads
         (adsbygoogle = window.adsbygoogle || []).push({});
         (adsbygoogle = window.adsbygoogle || []).push({});

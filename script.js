@@ -42,21 +42,56 @@ class BlogApp {
     }
 
     extractYouTubeVideoId(url) {
-        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const match = url.match(regex);
-        return match ? match[1] : null;
+        if (!url || typeof url !== 'string') {
+            return null;
+        }
+        
+        // Clean the URL
+        url = url.trim();
+        
+        // Various YouTube URL patterns
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+            /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+            /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+            /youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})/
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1] && match[1].length === 11) {
+                return match[1];
+            }
+        }
+        
+        return null;
     }
 
     addPost(postData) {
-        this.posts.unshift(postData);
-        this.savePosts();
-        this.renderPosts();
-        this.updateFooterStats();
-        
-        // Generate HTML file for the new post
-        generatePostHTMLFile(postData);
-        
-        this.showSuccessMessage('🎉 Post added successfully! Thank you for sharing your guitar journey with the Kannada community! Your post has been added to the blog and a new HTML page has been opened in a new tab. ಧನ್ಯವಾದಗಳು!');
+        try {
+            console.log('BlogApp.addPost called with:', postData);
+            
+            // Add post to beginning of array
+            this.posts.unshift(postData);
+            console.log('Post added to array, total posts:', this.posts.length);
+            
+            // Save to localStorage
+            this.savePosts();
+            console.log('Posts saved to localStorage');
+            
+            // Render posts
+            this.renderPosts();
+            console.log('Posts rendered');
+            
+            // Update footer stats
+            this.updateFooterStats();
+            console.log('Footer stats updated');
+            
+            // Success message removed - no popup shown
+        } catch (error) {
+            console.error('Error in addPost:', error);
+            this.showSuccessMessage('Error adding post: ' + error.message);
+        }
     }
 
     deletePost(postId) {
@@ -110,9 +145,9 @@ class BlogApp {
                     <span class="post-date">${date}</span>
                 </div>
                 
-                ${post.content ? `<div class="post-content">${this.escapeHtml(post.content)}</div>` : ''}
-                
                 ${videoHTML}
+                
+                ${post.content ? `<div class="post-content">${this.escapeHtml(post.content)}</div>` : ''}
                 
                 ${tagsHTML}
                 
@@ -125,15 +160,21 @@ class BlogApp {
 
     createVideoHTML(youtubeUrl) {
         const videoId = this.extractYouTubeVideoId(youtubeUrl);
-        if (!videoId) return '';
+        if (!videoId || videoId.length !== 11) {
+            console.warn('Invalid YouTube video ID:', videoId);
+            return '';
+        }
 
+        // Use simple embed URL without extra parameters to avoid Error 153
+        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        
         return `
             <div class="post-video">
                 <iframe 
-                    src="https://www.youtube.com/embed/${videoId}" 
+                    src="${embedUrl}" 
                     title="YouTube video player" 
                     frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                     allowfullscreen>
                 </iframe>
             </div>
@@ -222,6 +263,15 @@ class BlogApp {
         link.download = 'blog-posts.json';
         link.click();
         URL.revokeObjectURL(url);
+        
+        // Show instructions
+        setTimeout(() => {
+            alert('Posts exported! To generate HTML files in guitartabs folder:\n\n' +
+                  '1. Save the downloaded blog-posts.json to your project folder\n' +
+                  '2. Run: npm run generate-posts\n' +
+                  '   OR: node generate-posts.js blog-posts.json\n\n' +
+                  'This will automatically create all post HTML files in the guitartabs folder!');
+        }, 500);
     }
 
     // Method to import posts from JSON
@@ -475,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: 'Welcome to Kannada Guitar!',
                 content: 'Welcome to Kannada Guitar! ಸ್ವಾಗತ! 🎸\n\nThis is your first blog post where you can share your guitar journey, music videos, and musical thoughts with fellow Kannadigas.\n\nYou can add text content and YouTube videos to document your musical progress and share your passion for guitar with the Kannada community.\n\nJoin us in growing Kannada music and guitar culture. Try adding a new post using the form above!',
                 youtubeUrl: '',
-                tags: 'welcome, introduction, guitar, music, kannada, community',
+                // tags: 'welcome, introduction, guitar, music, kannada, community',
                 date: new Date().toISOString()
             }
         ];
@@ -500,8 +550,43 @@ function isValidSecureYouTubeUrl(url) {
     return youtubeRegex.test(url);
 }
 
+// Standalone function to extract YouTube video ID (used in generatePostHTMLFile)
+function extractYouTubeVideoId(url) {
+    if (!url || typeof url !== 'string') {
+        return null;
+    }
+    
+    // Clean the URL
+    url = url.trim();
+    
+    // Various YouTube URL patterns
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})/
+    ];
+    
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1] && match[1].length === 11) {
+            return match[1];
+        }
+    }
+    
+    return null;
+}
+
+// Standalone function to escape HTML (used in generatePostHTMLFile)
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Generate HTML file for individual posts
-function generatePostHTMLFile(postData) {
+async function generatePostHTMLFile(postData) {
     // Create a safe filename from the post title
     const safeTitle = postData.title
         .toLowerCase()
@@ -509,7 +594,8 @@ function generatePostHTMLFile(postData) {
         .replace(/\s+/g, '-')
         .substring(0, 50);
     
-    const filename = `post-${postData.id}-${safeTitle}.html`;
+    const filename = `guitartabs/post-${postData.id}-${safeTitle}.html`;
+    const filenameOnly = `post-${postData.id}-${safeTitle}.html`;
     
     // Format the date
     const postDate = new Date(postData.date).toLocaleDateString('en-US', {
@@ -524,18 +610,23 @@ function generatePostHTMLFile(postData) {
     let videoHTML = '';
     if (postData.youtubeUrl) {
         const videoId = extractYouTubeVideoId(postData.youtubeUrl);
-        if (videoId) {
+        if (videoId && videoId.length === 11) {
+            // Validate video ID is 11 characters (YouTube standard)
+            // For blob URLs (generated HTML files), use a simpler embed URL
+            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
             videoHTML = `
                 <div class="post-video">
                     <iframe 
-                        src="https://www.youtube.com/embed/${videoId}" 
+                        src="${embedUrl}" 
                         title="YouTube video player" 
                         frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                         allowfullscreen>
                     </iframe>
                 </div>
             `;
+        } else {
+            console.warn('Invalid YouTube video ID extracted:', videoId);
         }
     }
     
@@ -549,6 +640,43 @@ function generatePostHTMLFile(postData) {
         }
     }
     
+    // Generate SEO-friendly description from post content
+    const postDescription = postData.content.length > 160 
+        ? postData.content.substring(0, 157).trim() + '...'
+        : postData.content;
+    
+    // Generate keywords - combine post tags with Kannada Guitar keywords
+    const postTags = postData.tags ? postData.tags.split(',').map(t => t.trim()).join(', ') : '';
+    const seoKeywords = `kannada guitar, ಕನ್ನಡ ಗಿಟಾರ್, ${postTags}, guitar lessons in kannada, kannada music, guitar tutorials kannada, learn guitar kannada, kannada guitar songs, guitar tabs kannada, kannada guitar community, guitar classes bangalore, kannada guitar teacher, guitar learning kannada, kannada guitar chords, guitar lessons bangalore, kannada music lessons`.replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
+    
+    // Generate canonical URL (reuse safeTitle from above) - in guitartabs folder
+    const canonicalUrl = `https://kannadaguitar.com/guitartabs/post-${postData.id}-${safeTitle}.html`;
+    
+    // Generate video URL for Open Graph if YouTube video exists
+    const videoId = postData.youtubeUrl ? extractYouTubeVideoId(postData.youtubeUrl) : null;
+    const ogVideoTags = videoId ? `
+    <meta property="og:video" content="https://www.youtube.com/watch?v=${videoId}">
+    <meta property="og:video:url" content="https://www.youtube.com/watch?v=${videoId}">
+    <meta property="og:video:type" content="text/html">
+    <meta property="og:video:width" content="1280">
+    <meta property="og:video:height" content="720">` : '';
+    
+    // Generate video structured data if video exists
+    // Use JSON.stringify for proper escaping in JSON-LD
+    const videoStructuredData = videoId ? `,
+        "video": {
+            "@type": "VideoObject",
+            "name": ${JSON.stringify(postData.title)},
+            "description": ${JSON.stringify(postDescription)},
+            "thumbnailUrl": "https://img.youtube.com/vi/${videoId}/maxresdefault.jpg",
+            "uploadDate": "${new Date(postData.date).toISOString()}",
+            "contentUrl": "https://www.youtube.com/watch?v=${videoId}",
+            "embedUrl": "https://www.youtube.com/embed/${videoId}"
+        }` : '';
+    
+    // Format date for structured data (ISO format)
+    const isoDate = new Date(postData.date).toISOString();
+    
     // Read the template file content (we'll create this as a string for now)
     const templateContent = getPostTemplate();
     
@@ -556,53 +684,201 @@ function generatePostHTMLFile(postData) {
     const htmlContent = templateContent
         .replace(/\{\{POST_TITLE\}\}/g, escapeHtml(postData.title))
         .replace(/\{\{POST_DATE\}\}/g, postDate)
+        .replace(/\{\{POST_DATE_ISO\}\}/g, isoDate)
         .replace(/\{\{POST_CONTENT\}\}/g, escapeHtml(postData.content))
         .replace(/\{\{POST_VIDEO\}\}/g, videoHTML)
-        .replace(/\{\{POST_TAGS\}\}/g, tagsHTML);
+        .replace(/\{\{POST_TAGS\}\}/g, tagsHTML)
+        .replace(/\{\{POST_DESCRIPTION\}\}/g, escapeHtml(postDescription))
+        .replace(/\{\{POST_KEYWORDS\}\}/g, escapeHtml(seoKeywords))
+        .replace(/\{\{POST_CANONICAL_URL\}\}/g, canonicalUrl)
+        .replace(/\{\{POST_OG_VIDEO\}\}/g, ogVideoTags)
+        .replace(/\{\{POST_VIDEO_STRUCTURED_DATA\}\}/g, videoStructuredData)
+        .replace(/\{\{POST_ID\}\}/g, postData.id);
     
-    // Create and open the HTML file in a new tab
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    // Open in new tab instead of downloading
-    const newWindow = window.open(url, '_blank');
-    
-    // Check if popup was blocked
-    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-        // Fallback: download the file if popup is blocked
+    // Create and save the HTML file to guitartabs folder
+    try {
+        console.log('Generating HTML file in guitartabs folder:', filename);
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        
+        // Store the filename in the post data for future reference (relative path)
+        postData.htmlFile = filename;
+        
+        // Create URL for the blob
+        const url = URL.createObjectURL(blob);
+        
+        // Add navigation link for this post
+        addPostToNavigation(postData);
+        
+        // Try to use File System Access API (Chrome/Edge) to save directly to guitartabs folder
+        if ('showSaveFilePicker' in window) {
+            try {
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: filenameOnly,
+                    types: [{
+                        description: 'HTML files',
+                        accept: { 'text/html': ['.html'] }
+                    }]
+                });
+                
+                const writable = await fileHandle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                
+                console.log('File saved using File System Access API:', filenameOnly);
+                
+                // Open the file in a new tab for preview
+                const newWindow = window.open(url, '_blank');
+                if (!newWindow) {
+                    console.warn('Popup blocked, file saved but not opened');
+                }
+                
+                // Clean up URL
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 2000);
+                
+                return true;
+            } catch (fsError) {
+                // User cancelled or File System API failed, fall through to download
+                if (fsError.name !== 'AbortError') {
+                    console.log('File System API error:', fsError);
+                }
+                // Continue to download fallback
+            }
+        }
+        
+        // Fallback: Download the file (user can save to guitartabs folder manually)
+        // Also show a message about where to save it
         const link = document.createElement('a');
         link.href = url;
-        link.download = filename;
+        link.download = filenameOnly; // Just the filename
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        console.log('Popup blocked, file downloaded instead');
+        
+        console.log('File download initiated. Please save to guitartabs folder:', filename);
+        // Popup message removed - instructions available in console
+        
+        // Also open in new tab for preview
+        const newWindow = window.open(url, '_blank');
+        
+        // Clean up the URL after a delay
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 2000);
+        
+        return true;
+    } catch (error) {
+        console.error('Error creating HTML file:', error);
+        alert('Error creating HTML page: ' + error.message);
+        return false;
     }
-    
-    // Clean up the URL after a short delay to allow the page to load
-    setTimeout(() => {
-        URL.revokeObjectURL(url);
-    }, 1000);
-    
-    // Store the filename in the post data for future reference
-    postData.htmlFile = filename;
-    
-    // Add navigation link for this post
-    addPostToNavigation(postData);
-    
-    console.log(`HTML page opened in new tab: ${filename}`);
 }
 
 // Get the post template content
 function getPostTemplate() {
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{POST_TITLE}} - Kannada Guitar</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>{{POST_TITLE}} - Kannada Guitar | ಕನ್ನಡ ಗಿಟಾರ್</title>
+    <link rel="icon" type="image/png" href="../guitar_black.PNG">
+    <link rel="apple-touch-icon" href="../guitar_black.PNG">
+    <link rel="stylesheet" href="../styles.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{POST_DESCRIPTION}} - Kannada Guitar community for learning guitar in Kannada language. ಕನ್ನಡ ಗಿಟಾರ್ ಸಮುದಾಯ.">
+    <meta name="keywords" content="{{POST_KEYWORDS}}">
+    <meta name="author" content="Kannada Guitar Community">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{POST_TITLE}} - Kannada Guitar | ಕನ್ನಡ ಗಿಟಾರ್">
+    <meta property="og:description" content="{{POST_DESCRIPTION}} - Join the Kannada Guitar community and learn guitar in Kannada language.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{POST_CANONICAL_URL}}">
+    <meta property="og:image" content="https://kannadaguitar.com/images/kannada-guitar-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Kannada Guitar">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:locale:alternate" content="kn_IN">
+    {{POST_OG_VIDEO}}
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{POST_TITLE}} - Kannada Guitar">
+    <meta name="twitter:description" content="{{POST_DESCRIPTION}}">
+    <meta name="twitter:image" content="https://kannadaguitar.com/images/kannada-guitar-twitter.jpg">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#ff6b35">
+    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="application-name" content="Kannada Guitar">
+    <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{POST_CANONICAL_URL}}">
+    
+    <!-- Language and Region -->
+    <meta name="language" content="en-IN">
+    <meta name="geo.region" content="IN-KA">
+    <meta name="geo.placename" content="Karnataka, India">
+    
+    <!-- Article Meta Tags -->
+    <meta property="article:published_time" content="{{POST_DATE_ISO}}">
+    <meta property="article:author" content="Kannada Guitar Community">
+    <meta property="article:section" content="Guitar Lessons">
+    <meta property="article:tag" content="Kannada Guitar">
+    <meta property="article:tag" content="ಕನ್ನಡ ಗಿಟಾರ್">
+    
+    <!-- Structured Data for SEO (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "{{POST_TITLE}}",
+        "description": "{{POST_DESCRIPTION}}",
+        "image": "https://kannadaguitar.com/images/kannada-guitar-og.jpg",
+        "datePublished": "{{POST_DATE_ISO}}",
+        "dateModified": "{{POST_DATE_ISO}}",
+        "author": {
+            "@type": "Organization",
+            "name": "Kannada Guitar Community",
+            "url": "https://kannadaguitar.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Kannada Guitar",
+            "alternateName": "ಕನ್ನಡ ಗಿಟಾರ್ ಸಮುದಾಯ",
+            "url": "https://kannadaguitar.com",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://kannadaguitar.com/images/kannada-guitar-logo.png"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{POST_CANONICAL_URL}}"
+        },
+        "keywords": "{{POST_KEYWORDS}}",
+        "inLanguage": ["en-IN", "kn-IN"],
+        "about": {
+            "@type": "Thing",
+            "name": "Kannada Guitar Lessons"
+        },
+        "audience": {
+            "@type": "Audience",
+            "audienceType": "Kannada Guitar Enthusiasts"
+        }{{POST_VIDEO_STRUCTURED_DATA}}
+    }
+    </script>
     <style>
         .post-page {
             padding: 2rem 0;
@@ -754,23 +1030,23 @@ function getPostTemplate() {
                 
                 <nav class="main-nav">
                     <ul class="nav-list">
-                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="../index.html" class="nav-link">Home</a></li>
                         <li class="nav-dropdown">
-                            <a href="index.html#posts" class="nav-link">Posts ▼</a>
+                            <a href="../index.html#posts" class="nav-link">Posts ▼</a>
                             <ul class="dropdown-menu">
-                                <li><a href="index.html#posts" class="dropdown-link">View All Posts</a></li>
+                                <li><a href="../index.html#posts" class="dropdown-link">View All Posts</a></li>
                                 <li><a href="#" class="dropdown-link" onclick="openAddPostModal()">Add New Post</a></li>
                             </ul>
                         </li>
-                        <li><a href="about.html" class="nav-link">About</a></li>
-                        <li><a href="contact.html" class="nav-link">Contact</a></li>
+                        <li><a href="../about.html" class="nav-link">About</a></li>
+                        <li><a href="../contact.html" class="nav-link">Contact</a></li>
                     </ul>
                 </nav>
                 
                 <div class="header-actions">
                     <div class="search-container">
                         <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
-                        <button class="search-btn" onclick="window.location.href='index.html'">🔍</button>
+                        <button class="search-btn" onclick="window.location.href='../index.html'">🔍</button>
                     </div>
                     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
                 </div>
@@ -783,21 +1059,21 @@ function getPostTemplate() {
             <section class="post-page">
                 <div class="post-container">
                     <div class="post-meta">
-                        <a href="index.html" class="back-link">← Back to All Posts</a>
+                        <a href="../index.html" class="back-link">← Back to All Posts</a>
                         <span class="post-date">{{POST_DATE}}</span>
                     </div>
                     
-                    <h1 class="post-title">{{POST_TITLE}}</h1>
-                    
-                    <div class="post-content">{{POST_CONTENT}}</div>
+                    <h1 class="post-title">{{POST_TITLE}} - Kannada Guitar</h1>
                     
                     {{POST_VIDEO}}
+                    
+                    <div class="post-content">{{POST_CONTENT}}</div>
                     
                     {{POST_TAGS}}
                     
                     <div class="post-actions">
-                        <a href="index.html" class="action-btn primary">View All Posts</a>
-                        <a href="contact.html" class="action-btn secondary">Contact Us</a>
+                        <a href="../index.html" class="action-btn primary">View All Posts</a>
+                        <a href="../contact.html" class="action-btn secondary">Contact Us</a>
                     </div>
                 </div>
             </section>
@@ -821,20 +1097,20 @@ function getPostTemplate() {
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="index.html#posts">All Posts</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../index.html#posts">All Posts</a></li>
+                        <li><a href="../about.html">About</a></li>
+                        <li><a href="../contact.html">Contact</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
                     <h4>Features</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html#create">Create Post</a></li>
-                        <li><a href="index.html#videos">Video Posts</a></li>
-                        <li><a href="index.html#tags">Browse by Tags</a></li>
-                        <li><a href="index.html#search">Search</a></li>
+                        <li><a href="../index.html#create">Create Post</a></li>
+                        <li><a href="../index.html#videos">Video Posts</a></li>
+                        <li><a href="../index.html#tags">Browse by Tags</a></li>
+                        <li><a href="../index.html#search">Search</a></li>
                     </ul>
                 </div>
                 
@@ -851,7 +1127,7 @@ function getPostTemplate() {
             <div class="footer-bottom">
                 <p>&copy; 2024 Kannada Guitar. All rights reserved. Built with ❤️ using HTML, CSS & JavaScript.</p>
                 <div class="footer-actions">
-                    <a href="index.html" class="footer-btn">Back to Home</a>
+                    <a href="../index.html" class="footer-btn">Back to Home</a>
                 </div>
             </div>
         </div>
@@ -894,28 +1170,60 @@ function getPostTemplate() {
 // Generate secure CAPTCHA
 function generateSecureCaptcha() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    secureCaptchaCode = '';
+    let code = '';
     for (let i = 0; i < 6; i++) {
-        secureCaptchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    
+    // Store in both local and window variables for compatibility
+    secureCaptchaCode = code;
+    window.secureCaptchaCode = code;
     
     const captchaDisplay = document.getElementById('secureCaptchaDisplay');
     if (captchaDisplay) {
-        captchaDisplay.textContent = secureCaptchaCode;
+        captchaDisplay.textContent = code;
         captchaDisplay.style.background = `linear-gradient(45deg, #${Math.floor(Math.random()*16777215).toString(16)}, #${Math.floor(Math.random()*16777215).toString(16)})`;
         captchaDisplay.style.color = '#fff';
         captchaDisplay.style.fontWeight = 'bold';
         captchaDisplay.style.letterSpacing = '3px';
+        captchaDisplay.style.padding = '0.5rem';
+        captchaDisplay.style.borderRadius = '5px';
+        captchaDisplay.style.minWidth = '120px';
+        captchaDisplay.style.textAlign = 'center';
+    } else {
+        console.error('CAPTCHA display element not found: secureCaptchaDisplay');
     }
 }
 
 // Open Add Post Modal
 function openAddPostModal() {
-    const modal = document.getElementById('addPostModal');
-    if (modal) {
-        modal.classList.add('active');
-        generateSecureCaptcha();
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    try {
+        const modal = document.getElementById('addPostModal');
+        if (modal) {
+            // Make sure modal is visible
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+            
+            // Generate CAPTCHA
+            generateSecureCaptcha();
+            
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on first input for better UX
+            setTimeout(() => {
+                const firstInput = document.getElementById('securePostTitle');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        } else {
+            console.error('Modal not found: addPostModal');
+            alert('Error: Modal not found. Please refresh the page.');
+        }
+    } catch (error) {
+        console.error('Error opening modal:', error);
+        alert('Error opening modal: ' + error.message);
     }
 }
 
@@ -928,6 +1236,7 @@ function closeAddPostModal() {
         
         setTimeout(() => {
             modal.classList.remove('active');
+            modal.style.display = 'none';
             modal.style.animation = '';
             document.body.style.overflow = 'auto'; // Restore scrolling
             
@@ -1015,8 +1324,9 @@ function validateSecureForm(formData) {
         return false;
     }
 
-    // Validate CAPTCHA
-    if (captcha.toUpperCase() !== secureCaptchaCode) {
+    // Validate CAPTCHA - check both local and window variables
+    const currentCaptchaCode = secureCaptchaCode || window.secureCaptchaCode || '';
+    if (captcha.toUpperCase() !== currentCaptchaCode) {
         showSecureErrorMessage('Invalid security code. Please try again.');
         generateSecureCaptcha(); // Generate new CAPTCHA
         return false;
@@ -1158,77 +1468,108 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         const secureForm = document.getElementById('securePostForm');
         if (secureForm) {
-        secureForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Check rate limit
-            if (!checkSecureRateLimit()) {
-                return;
-            }
-
-            const formData = new FormData(this);
-            
-            // Validate form
-            if (!validateSecureForm(formData)) {
-                return;
-            }
-
-            // Disable submit button to prevent double submission
-            const submitBtn = document.getElementById('secureSubmitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Publishing...';
-
-            // Close modal immediately after validation passes
-            closeAddPostModal();
-
-            // Update rate limiting
-            secureFormSubmissionCount++;
-            secureLastSubmissionTime = Date.now();
-
-            // Create post data
-            const postData = {
-                id: Date.now().toString(),
-                title: formData.get('title').trim(),
-                content: formData.get('content').trim(),
-                youtubeUrl: formData.get('youtubeUrl').trim(),
-                tags: formData.get('tags').trim(),
-                date: new Date().toISOString()
-            };
-
-            // Add post using existing blog app functionality
-            if (window.blogApp) {
-                window.blogApp.addPost(postData);
+            secureForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submitted');
                 
-                // Generate HTML file for the new post
-                generatePostHTMLFile(postData);
+                // Check rate limit
+                if (!checkSecureRateLimit()) {
+                    console.log('Rate limit exceeded');
+                    return;
+                }
+
+                const formData = new FormData(this);
+                console.log('Form data collected');
                 
-                // Show success message after modal has closed (with delay for animation)
-                setTimeout(() => {
-                    showSecureSuccessMessage('🎉 Post published successfully! Thank you for sharing your guitar journey with the Kannada community! Your post has been added to the blog and a new HTML page has been opened in a new tab. We appreciate your contribution to growing Kannada music culture! ಧನ್ಯವಾದಗಳು! 🙏');
-                }, 400);
-            } else {
-                // Try to wait a bit for blogApp to be available
-                setTimeout(() => {
-                    if (window.blogApp) {
+                // Validate form
+                if (!validateSecureForm(formData)) {
+                    console.log('Form validation failed');
+                    return;
+                }
+                console.log('Form validation passed');
+
+                // Disable submit button to prevent double submission
+                const submitBtn = document.getElementById('secureSubmitBtn');
+                if (!submitBtn) {
+                    showSecureErrorMessage('Error: Submit button not found. Please refresh the page.');
+                    return;
+                }
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Publishing...';
+
+                // DON'T close modal yet - wait until post is saved
+                // closeAddPostModal();
+
+                // Update rate limiting
+                secureFormSubmissionCount++;
+                secureLastSubmissionTime = Date.now();
+
+                // Create post data
+                const postData = {
+                    id: Date.now().toString(),
+                    title: formData.get('title').trim(),
+                    content: formData.get('content').trim(),
+                    youtubeUrl: formData.get('youtubeUrl').trim(),
+                    tags: formData.get('tags').trim(),
+                    date: new Date().toISOString()
+                };
+
+                // Add post using existing blog app functionality
+                console.log('Attempting to add post:', postData);
+                console.log('blogApp available:', !!window.blogApp);
+                
+                if (window.blogApp) {
+                    try {
+                        // Add post (this saves to localStorage and renders)
                         window.blogApp.addPost(postData);
-                        generatePostHTMLFile(postData);
+                        console.log('Post added successfully via blogApp');
                         
-                        // Show success message after modal has closed
-                        setTimeout(() => {
-                            showSecureSuccessMessage('🎉 Post published successfully! Thank you for sharing your guitar journey with the Kannada community! Your post has been added to the blog and a new HTML page has been opened in a new tab. We appreciate your contribution to growing Kannada music culture! ಧನ್ಯವಾದಗಳು! 🙏');
-                        }, 400);
-                    } else {
-                        showSecureErrorMessage('Error: Blog app not available. Please refresh the page and try again.');
+                        // Close modal (no success message popup)
+                        closeAddPostModal();
+                    } catch (error) {
+                        console.error('Error adding post:', error);
+                        showSecureErrorMessage('Error adding post: ' + error.message);
+                        // Re-enable button on error
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Publish Post';
+                        }
                     }
-                }, 500);
-            }
+                } else {
+                    console.warn('blogApp not available, waiting...');
+                    // Try to wait a bit for blogApp to be available
+                    let retries = 0;
+                    const maxRetries = 10;
+                    const checkBlogApp = setInterval(() => {
+                        retries++;
+                        if (window.blogApp) {
+                            clearInterval(checkBlogApp);
+                            try {
+                                window.blogApp.addPost(postData);
+                                closeAddPostModal();
+                                // No success message popup
+                            } catch (error) {
+                                console.error('Error adding post after retry:', error);
+                                showSecureErrorMessage('Error adding post: ' + error.message);
+                            }
+                        } else if (retries >= maxRetries) {
+                            clearInterval(checkBlogApp);
+                            console.error('blogApp not available after retries');
+                            showSecureErrorMessage('Error: Blog app not available. Please refresh the page and try again.');
+                        }
+                    }, 100);
+                }
 
-            // Re-enable button
-            setTimeout(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Publish Post';
-            }, 2000);
-        });
+                // Re-enable button
+                setTimeout(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Publish Post';
+                    }
+                }, 2000);
+            });
+        } else {
+            console.error('Form not found: securePostForm');
         }
     }, 100); // Small delay to ensure blogApp is initialized
 
@@ -1244,108 +1585,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Revenue and Monetization Functions
-
-// Donation Modal Functions
-function openDonationModal() {
-    const modal = document.getElementById('donationModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeDonationModal() {
-    const modal = document.getElementById('donationModal');
-    if (modal) {
-        modal.style.display = 'none';
-        modal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    }
-}
-
-
-// Donation Processing
-function processDonation(amount) {
-    if (amount === 0) {
-        // Custom amount
-        const customAmount = prompt('Enter donation amount (₹):');
-        if (customAmount && !isNaN(customAmount) && customAmount > 0) {
-            amount = parseFloat(customAmount);
-        } else {
-            return;
-        }
-    }
-    
-    // Track donation attempt
-    trackRevenueEvent('donation_attempt', { amount: amount });
-    
-    // Show payment options
-    showPaymentOptions(amount);
-}
-
-function showPaymentOptions(amount) {
-    const message = `Donation Amount: ₹${amount}\n\nChoose your payment method:`;
-    const choice = confirm(message + '\n\nClick OK for UPI, Cancel for other options');
-    
-    if (choice) {
-        openUPI(amount);
-    } else {
-        // Show other payment options
-        const bankChoice = confirm('Click OK for Bank Transfer, Cancel for PayPal');
-        if (bankChoice) {
-            openBankTransfer(amount);
-        } else {
-            openPayPal(amount);
-        }
-    }
-}
-
-// Payment Methods
-function openUPI(amount = 0) {
-    // UPI ID - Replace with your actual UPI ID
-    const upiId = 'kannadaguitar@paytm'; // Replace with your UPI ID
-    const upiUrl = `upi://pay?pa=${upiId}&pn=Kannada%20Guitar&am=${amount}&cu=INR&tn=Donation%20for%20Kannada%20Guitar%20Community`;
-    
-    // Try to open UPI app
-    window.open(upiUrl, '_blank');
-    
-    // Fallback - show UPI details
-    setTimeout(() => {
-        alert(`UPI Payment Details:\n\nUPI ID: ${upiId}\nAmount: ₹${amount}\n\nPlease send the payment and we'll confirm it within 24 hours.`);
-    }, 1000);
-    
-    trackRevenueEvent('upi_payment_initiated', { amount: amount });
-}
-
-function openBankTransfer(amount = 0) {
-    // Bank details - Replace with your actual bank details
-    const bankDetails = `
-Bank Transfer Details:
-
-Bank Name: State Bank of India
-Account Name: Kannada Guitar Community
-Account Number: 1234567890123456
-IFSC Code: SBIN0001234
-Branch: Bangalore Main Branch
-
-Amount: ₹${amount}
-Reference: KG-DONATION-${Date.now()}
-
-Please transfer the amount and email the transaction details to kannadaguitarcom@gmail.com
-    `;
-    
-    alert(bankDetails);
-    trackRevenueEvent('bank_transfer_initiated', { amount: amount });
-}
-
-function openPayPal(amount = 0) {
-    // PayPal link - Replace with your actual PayPal link
-    const paypalUrl = `https://www.paypal.com/donate/?hosted_button_id=YOUR_PAYPAL_BUTTON_ID&amount=${amount}`;
-    window.open(paypalUrl, '_blank');
-    
-    trackRevenueEvent('paypal_payment_initiated', { amount: amount });
-}
 
 
 // Search Functionality
@@ -1467,43 +1706,13 @@ function loadPostNavigation() {
     console.log(`Loaded ${navigationData.length} posts to navigation menu`);
 }
 
-// Revenue Tracking
-function trackRevenueEvent(eventName, data = {}) {
-    // Track revenue events for analytics
-    const eventData = {
-        event: eventName,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        ...data
-    };
-    
-    // Store in localStorage for now (in production, send to analytics service)
-    const revenueEvents = JSON.parse(localStorage.getItem('kannadaGuitarRevenueEvents') || '[]');
-    revenueEvents.push(eventData);
-    localStorage.setItem('kannadaGuitarRevenueEvents', JSON.stringify(revenueEvents));
-    
-    // Log to console for development
-    console.log('Revenue Event:', eventData);
-    
-    // In production, send to your analytics service
-    // Example: gtag('event', eventName, data);
-}
-
-
-// Add some helpful console commands for development
+// Expose functions to window object for inline onclick handlers
+// This ensures functions are available globally
 window.openAddPostModal = openAddPostModal;
 window.closeAddPostModal = closeAddPostModal;
 window.generateSecureCaptcha = generateSecureCaptcha;
 window.showPostTerms = showPostTerms;
 
-// Revenue and monetization functions
-window.openDonationModal = openDonationModal;
-window.closeDonationModal = closeDonationModal;
-window.processDonation = processDonation;
-window.openUPI = openUPI;
-window.openBankTransfer = openBankTransfer;
-window.openPayPal = openPayPal;
 
 // Search functionality
 window.focusSearchInput = focusSearchInput;

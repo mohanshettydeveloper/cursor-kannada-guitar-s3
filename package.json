@@ -6,7 +6,9 @@
   "scripts": {
     "deploy": "./deploy.sh",
     "test": "echo \"No tests specified\" && exit 0",
-    "build": "echo \"No build process needed for static site\" && exit 0"
+    "build": "echo \"No build process needed for static site\" && exit 0",
+    "generate-posts": "node generate-posts.js",
+    "sync-posts": "node generate-posts.js"
   },
   "keywords": [
     "kannada",

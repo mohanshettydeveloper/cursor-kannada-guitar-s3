@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Login - Kannada Guitar Community</title>
+    <link rel="icon" type="image/png" href="guitar_black.PNG">
+    <link rel="apple-touch-icon" href="guitar_black.PNG">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Login to your Kannada Guitar Community account to access your profile and share your music journey.">
+    <meta name="keywords" content="kannada guitar login, member login, guitar community login">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://kannadaguitar.com/login.html">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-container">
+                        <div class="music-icon">🎸</div>
+                        <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
+                    </div>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="main-nav" id="mainNav">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="index.html#posts" class="nav-link">Posts</a></li>
+                        <li><a href="about.html" class="nav-link">About</a></li>
+                        <li><a href="contact.html" class="nav-link">Contact</a></li>
+                        <li class="nav-dropdown">
+                            <a href="#" class="nav-link">Account ▼</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="login.html" class="dropdown-link active">Login</a></li>
+                                <li><a href="register.html" class="dropdown-link">Register</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
+                        <button class="search-btn" onclick="window.location.href='index.html'">🔍</button>
+                    </div>
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="registration-section">
+                <div class="registration-container">
+                    <h2 class="registration-title">Member Login</h2>
+                    <p class="registration-subtitle">Welcome back! Please login to access your account</p>
+                    
+                    <div class="registration-content" style="grid-template-columns: 1fr; max-width: 500px; margin: 0 auto;">
+                        <div class="registration-form-container">
+                            <form id="loginForm" class="registration-form">
+                                <div class="form-group">
+                                    <label for="loginUsername">Username or Email *</label>
+                                    <input type="text" id="loginUsername" name="username" required placeholder="Enter your username or email" autocomplete="username">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="loginPassword">Password *</label>
+                                    <input type="password" id="loginPassword" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                                </div>
+                                
+                                <!-- Honeypot field (hidden from users) -->
+                                <div class="honeypot-field" style="display: none;">
+                                    <label for="loginWebsite">Website (leave blank):</label>
+                                    <input type="text" id="loginWebsite" name="website" tabindex="-1" autocomplete="off">
+                                </div>
+                                
+                                <!-- Time-based validation (hidden) -->
+                                <input type="hidden" id="loginFormStartTime" name="formStartTime">
+                                
+                                <!-- CAPTCHA Section -->
+                                <div class="form-group captcha-group">
+                                    <label for="loginCaptcha">Security Verification *</label>
+                                    <div class="captcha-container">
+                                        <div class="captcha-display" id="loginCaptchaDisplay"></div>
+                                        <button type="button" class="captcha-refresh" onclick="generateLoginCaptcha()" title="Refresh CAPTCHA">🔄</button>
+                                    </div>
+                                    <input type="text" id="loginCaptcha" name="captcha" required placeholder="Enter the code above" maxlength="6" autocomplete="off">
+                                    <small class="captcha-help">Please enter the 6-character code shown above</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                                        <span class="checkmark"></span>
+                                        Remember me
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" id="loginSubmitBtn">Login</button>
+                                <div class="security-notice">
+                                    <small>🔒 This form is protected against spam and automated attacks</small>
+                                </div>
+                                
+                                <div class="login-link">
+                                    <p>Don't have an account? <a href="register.html">Register here</a></p>
+                                    <p style="margin-top: 0.5rem;"><a href="contact.html" style="font-size: 0.9rem;">Forgot password? Contact support</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Kannada Guitar</h3>
+                    <p>A platform for all Kannadigas to share their guitar talent and contribute to growing Kannada music.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#posts">All Posts</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Account</h4>
+                    <ul class="footer-links">
+                        <li><a href="register.html">Create Account</a></li>
+                        <li><a href="login.html">Member Login</a></li>
+                        <li><a href="contact.html">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Kannada Guitar. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Track form start time for bot detection
+        let loginFormStartTime = Date.now();
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginFormStartTime').value = loginFormStartTime;
+            // Check if user is already logged in
+            if (isLoggedIn()) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+                document.querySelector('.theme-toggle').textContent = '🌙';
+            } else {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+        }
+
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        });
+
+        // Security variables
+        let loginCaptchaCode = '';
+        let loginFormSubmissionCount = 0;
+        let lastLoginSubmissionTime = 0;
+        const LOGIN_RATE_LIMIT_WINDOW = 300000; // 5 minutes
+        const MAX_LOGIN_ATTEMPTS = 5; // 5 attempts per 5 minutes
+        const MIN_LOGIN_FORM_TIME = 3000; // Minimum 3 seconds
+
+        // Generate CAPTCHA
+        function generateLoginCaptcha() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            loginCaptchaCode = '';
+            for (let i = 0; i < 6; i++) {
+                loginCaptchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            const captchaDisplay = document.getElementById('loginCaptchaDisplay');
+            if (captchaDisplay) {
+                captchaDisplay.textContent = loginCaptchaCode;
+                captchaDisplay.style.background = `linear-gradient(45deg, #${Math.floor(Math.random()*16777215).toString(16)}, #${Math.floor(Math.random()*16777215).toString(16)})`;
+                captchaDisplay.style.color = '#fff';
+                captchaDisplay.style.fontWeight = 'bold';
+                captchaDisplay.style.letterSpacing = '3px';
+                captchaDisplay.style.padding = '0.5rem';
+                captchaDisplay.style.borderRadius = '5px';
+                captchaDisplay.style.minWidth = '120px';
+                captchaDisplay.style.textAlign = 'center';
+            }
+        }
+
+        // Initialize CAPTCHA on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateLoginCaptcha();
+        });
+
+        // Rate limiting check
+        function checkLoginRateLimit() {
+            const now = Date.now();
+            
+            if (now - lastLoginSubmissionTime > LOGIN_RATE_LIMIT_WINDOW) {
+                loginFormSubmissionCount = 0;
+            }
+            
+            if (loginFormSubmissionCount >= MAX_LOGIN_ATTEMPTS) {
+                const remainingTime = Math.ceil((LOGIN_RATE_LIMIT_WINDOW - (now - lastLoginSubmissionTime)) / 60000);
+                showErrorMessage(`Too many login attempts. Please wait ${remainingTime} minutes before trying again.`);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Time-based bot detection
+        function checkLoginFormTiming() {
+            const formEndTime = Date.now();
+            const formDuration = formEndTime - loginFormStartTime;
+            
+            if (formDuration < MIN_LOGIN_FORM_TIME) {
+                showErrorMessage('Form submission too fast. Please try again.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Check if user is logged in
+        function isLoggedIn() {
+            const currentUser = localStorage.getItem('currentUser');
+            return currentUser !== null;
+        }
+
+        // Validate login form
+        function validateLoginForm(formData) {
+            const username = formData.get('username').trim();
+            const password = formData.get('password');
+            const captcha = formData.get('captcha').trim();
+            const website = formData.get('website'); // Honeypot
+
+            // Check honeypot
+            if (website) {
+                console.log('Bot detected via honeypot in login form');
+                showErrorMessage('Invalid submission detected.');
+                return false;
+            }
+
+            if (!username || !password || !captcha) {
+                showErrorMessage('Please fill in all required fields.');
+                return false;
+            }
+
+            // Validate CAPTCHA
+            if (captcha.toUpperCase() !== loginCaptchaCode) {
+                showErrorMessage('Invalid security code. Please try again.');
+                generateLoginCaptcha();
+                return false;
+            }
+
+            if (!checkLoginFormTiming()) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Authenticate user
+        function authenticateUser(username, password) {
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            
+            // Try to find user by username or email
+            const user = registeredUsers.find(u => 
+                u.username.toLowerCase() === username.toLowerCase() || 
+                u.email.toLowerCase() === username.toLowerCase()
+            );
+            
+            if (!user) {
+                return null;
+            }
+            
+            // Verify password (in production, use proper password hashing)
+            const passwordHash = btoa(password); // Base64 encoding (NOT secure, matches registration)
+            if (user.passwordHash === passwordHash) {
+                return user;
+            }
+            
+            return null;
+        }
+
+        // Login form handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!checkLoginRateLimit()) {
+                return;
+            }
+
+            const formData = new FormData(this);
+            
+            if (!validateLoginForm(formData)) {
+                return;
+            }
+
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+
+            loginFormSubmissionCount++;
+            lastLoginSubmissionTime = Date.now();
+
+            const username = formData.get('username').trim();
+            const password = formData.get('password');
+            const rememberMe = formData.get('rememberMe');
+
+            // Simulate API call delay
+            setTimeout(() => {
+                const user = authenticateUser(username, password);
+                
+                if (user) {
+                    // Store current user session
+                    const sessionData = {
+                        id: user.id,
+                        username: user.username,
+                        fullName: user.fullName,
+                        email: user.email,
+                        location: user.location,
+                        experience: user.experience,
+                        loginTime: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(sessionData));
+                    
+                    // If remember me is checked, store for longer (7 days)
+                    if (rememberMe) {
+                        const expiryTime = new Date();
+                        expiryTime.setDate(expiryTime.getDate() + 7);
+                        sessionData.expiryTime = expiryTime.toISOString();
+                        localStorage.setItem('currentUser', JSON.stringify(sessionData));
+                    }
+                    
+                    showSuccessMessage('Login successful! Redirecting...');
+                    
+                    // Redirect to home page
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showErrorMessage('Invalid username/email or password. Please try again.');
+                    generateLoginCaptcha();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                }
+            }, 500);
+        });
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 1.5rem 2rem;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+                max-width: 400px;
+                font-weight: 500;
+            `;
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #dc3545;
+                color: white;
+                padding: 1.5rem 2rem;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+                max-width: 400px;
+                font-weight: 500;
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+    </script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+</body>
+</html>
