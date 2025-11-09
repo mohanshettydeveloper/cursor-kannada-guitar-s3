@@ -75,6 +75,28 @@ function updateNavigation() {
             dropdownTrigger.innerHTML = `Account ▼`;
         }
     }
+    
+    // Show/hide "Add New Post" and "Create Post" links based on login status
+    const addPostLinks = document.querySelectorAll('a[onclick*="openAddPostModal"]');
+    addPostLinks.forEach(link => {
+        if (user) {
+            // Show link for logged-in users
+            link.style.display = '';
+            const parentLi = link.closest('li');
+            if (parentLi) {
+                parentLi.style.display = '';
+            }
+        } else {
+            // Hide link for non-logged-in users
+            link.style.display = 'none';
+            // Keep parent visible if it has other content, but hide just the link
+            const parentLi = link.closest('li');
+            // Only hide parent if it only contains this link (or has minimal content)
+            if (parentLi && parentLi.children.length === 1 && parentLi.textContent.trim() === link.textContent.trim()) {
+                parentLi.style.display = 'none';
+            }
+        }
+    });
 }
 
 // Show user profile - redirect to profile page

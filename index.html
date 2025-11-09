@@ -13,11 +13,33 @@
         // Define modal functions immediately so they're available for inline onclick handlers
         function openAddPostModal() {
             try {
+                // Check if user is logged in
+                const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+                if (!currentUser) {
+                    // Show login prompt
+                    const loginConfirm = confirm('You must be logged in to create a post. Would you like to login now?');
+                    if (loginConfirm) {
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+                
                 const modal = document.getElementById('addPostModal');
                 if (modal) {
                     modal.style.display = 'flex';
                     modal.classList.add('active');
                     document.body.style.overflow = 'hidden';
+                    
+                    // Show user info in modal
+                    const postingAsUser = document.getElementById('postingAsUser');
+                    const postingAsUserName = document.getElementById('postingAsUserName');
+                    if (postingAsUser && postingAsUserName && currentUser) {
+                        const displayName = currentUser.fullName || currentUser.username || 'User';
+                        postingAsUserName.textContent = displayName;
+                        postingAsUser.style.display = 'block';
+                    } else if (postingAsUser) {
+                        postingAsUser.style.display = 'none';
+                    }
                     
                     // Generate CAPTCHA if function is available
                     if (typeof generateSecureCaptcha === 'function') {
@@ -96,7 +118,7 @@
 
 2. COPYRIGHT
    - You must own the rights to any content you post
-   - YouTube videos must be your own or properly attributed
+   - Videos (YouTube, Instagram, Facebook) must be your own or properly attributed
    - No copyrighted material without permission
 
 3. COMMUNITY STANDARDS
@@ -154,8 +176,8 @@ By creating a post, you agree to these terms and confirm your content is appropr
     <meta name="twitter:image" content="https://kannadaguitar.com/images/kannada-guitar-twitter.jpg">
     
     <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#ff6b35">
-    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="theme-color" content="#d7263d">
+    <meta name="msapplication-TileColor" content="#d7263d">
     <meta name="application-name" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -205,7 +227,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                         <div class="music-icon">🎸</div>
                         <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
                     </div>
-                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಹೆಮ್ಮೆಯ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
                 </div>
                 
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
@@ -298,7 +320,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                         </div>
                         <div class="affiliate-item">
                             <a href="https://amzn.to/YOUR_AFFILIATE_LINK_2" target="_blank" rel="nofollow sponsored">
-                                <img src="https://via.placeholder.com/200x150/f7931e/ffffff?text=Guitar+Pick" alt="Guitar Pick" class="affiliate-image">
+                                <img src="https://via.placeholder.com/200x150/d7263d/ffffff?text=Guitar+Pick" alt="Guitar Pick" class="affiliate-image">
                                 <h4>Guitar Picks Set</h4>
                                 <p class="affiliate-price">₹199 - ₹499</p>
                                 <span class="affiliate-badge">Popular</span>
@@ -306,7 +328,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                         </div>
                         <div class="affiliate-item">
                             <a href="https://amzn.to/YOUR_AFFILIATE_LINK_3" target="_blank" rel="nofollow sponsored">
-                                <img src="https://via.placeholder.com/200x150/ffd23f/333333?text=Guitar+Strap" alt="Guitar Strap" class="affiliate-image">
+                                <img src="https://via.placeholder.com/200x150/ffd447/333333?text=Guitar+Strap" alt="Guitar Strap" class="affiliate-image">
                                 <h4>Guitar Strap</h4>
                                 <p class="affiliate-price">₹399 - ₹999</p>
                                 <span class="affiliate-badge">New</span>
@@ -381,6 +403,9 @@ By creating a post, you agree to these terms and confirm your content is appropr
             
             <div class="modal-body">
                 <form id="securePostForm" class="secure-post-form">
+                    <div id="postingAsUser" class="posting-as-user" style="display: none;">
+                        <small>Posting as: <span id="postingAsUserName"></span></small>
+                    </div>
                     <div class="form-group">
                         <label for="securePostTitle">Post Title *</label>
                         <input type="text" id="securePostTitle" name="title" required placeholder="Enter post title">
@@ -392,9 +417,9 @@ By creating a post, you agree to these terms and confirm your content is appropr
                     </div>
                     
                     <div class="form-group">
-                        <label for="secureYoutubeUrl">YouTube Video URL (Optional)</label>
-                        <input type="url" id="secureYoutubeUrl" name="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
-                        <small class="help-text">Paste any YouTube video URL</small>
+                        <label for="secureYoutubeUrl">Video URL (Optional)</label>
+                        <input type="url" id="secureYoutubeUrl" name="youtubeUrl" placeholder="YouTube, Instagram, or Facebook video URL">
+                        <small class="help-text">Paste YouTube, Instagram, or Facebook video URL</small>
                     </div>
                     
                     <div class="form-group">
@@ -507,6 +532,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
 
     <script src="auth.js"></script>
     <script src="mobile-menu.js"></script>
+    <script src="comments.js"></script>
     <script src="script.js"></script>
     <script>
         

@@ -70,7 +70,7 @@ function getPostTemplate() {
     <!-- SEO Meta Tags -->
     <meta name="description" content="{{POST_DESCRIPTION}} - Kannada Guitar community for learning guitar in Kannada language. ಕನ್ನಡ ಗಿಟಾರ್ ಸಮುದಾಯ.">
     <meta name="keywords" content="{{POST_KEYWORDS}}">
-    <meta name="author" content="Kannada Guitar Community">
+    <meta name="author" content="{{POST_AUTHOR}}">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
     <meta name="bingbot" content="index, follow">
@@ -95,8 +95,8 @@ function getPostTemplate() {
     <meta name="twitter:image" content="https://kannadaguitar.com/images/kannada-guitar-twitter.jpg">
     
     <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#ff6b35">
-    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="theme-color" content="#d7263d">
+    <meta name="msapplication-TileColor" content="#d7263d">
     <meta name="application-name" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,7 @@ function getPostTemplate() {
     
     <!-- Article Meta Tags -->
     <meta property="article:published_time" content="{{POST_DATE_ISO}}">
-    <meta property="article:author" content="Kannada Guitar Community">
+    <meta property="article:author" content="{{POST_AUTHOR}}">
     <meta property="article:section" content="Guitar Lessons">
     <meta property="article:tag" content="Kannada Guitar">
     <meta property="article:tag" content="ಕನ್ನಡ ಗಿಟಾರ್">
@@ -128,9 +128,8 @@ function getPostTemplate() {
         "datePublished": "{{POST_DATE_ISO}}",
         "dateModified": "{{POST_DATE_ISO}}",
         "author": {
-            "@type": "Organization",
-            "name": "Kannada Guitar Community",
-            "url": "https://kannadaguitar.com"
+            "@type": "Person",
+            "name": "{{POST_AUTHOR}}"
         },
         "publisher": {
             "@type": "Organization",
@@ -171,26 +170,43 @@ function getPostTemplate() {
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             border: 1px solid #e9ecef;
         }
-        .post-meta {
+        .post-header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid #e9ecef;
         }
+        .post-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+        .post-author {
+            font-weight: 600;
+            color: #d7263d;
+        }
+        .post-meta-dot {
+            color: #adb5bd;
+        }
         .post-date {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         .back-link {
-            color: #ff6b35;
+            color: #d7263d;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
         .back-link:hover {
-            color: #f7931e;
+            color: #ffd447;
         }
         .post-content {
             line-height: 1.8;
@@ -216,7 +232,7 @@ function getPostTemplate() {
             margin-top: 2rem;
         }
         .tag {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            background: linear-gradient(135deg, #d7263d 0%, #ffd447 100%);
             color: white;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -240,12 +256,12 @@ function getPostTemplate() {
             display: inline-block;
         }
         .action-btn.primary {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            background: linear-gradient(135deg, #d7263d 0%, #ffd447 100%);
             color: white;
         }
         .action-btn.primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 5px 15px rgba(215, 38, 61, 0.38);
         }
         .action-btn.secondary {
             background: #6c757d;
@@ -262,11 +278,20 @@ function getPostTemplate() {
             border-color: #404040;
             color: #e0e0e0;
         }
-        .dark-theme .post-meta {
+        .dark-theme .post-header-bar {
             border-bottom-color: #555;
         }
         .dark-theme .post-date {
-            color: #999;
+            color: #adb5bd;
+        }
+        .dark-theme .post-meta {
+            color: #adb5bd;
+        }
+        .dark-theme .post-author {
+            color: #ffd447;
+        }
+        .dark-theme .post-meta-dot {
+            color: #666;
         }
         .dark-theme .post-content {
             color: #d0d0d0;
@@ -280,7 +305,7 @@ function getPostTemplate() {
                 padding: 2rem;
                 margin: 1rem;
             }
-            .post-meta {
+            .post-header-bar {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
@@ -337,9 +362,13 @@ function getPostTemplate() {
         <div class="container">
             <section class="post-page">
                 <div class="post-container">
-                    <div class="post-meta">
+                    <div class="post-header-bar">
                         <a href="../index.html" class="back-link">← Back to All Posts</a>
-                        <span class="post-date">{{POST_DATE}}</span>
+                        <div class="post-meta">
+                            <span class="post-author">👤 {{POST_AUTHOR}}</span>
+                            <span class="post-meta-dot">•</span>
+                            <span class="post-date">{{POST_DATE}}</span>
+                        </div>
                     </div>
                     
                     <h1 class="post-title">{{POST_TITLE}} - Kannada Guitar</h1>
@@ -532,6 +561,8 @@ function generatePostHTMLFile(postData) {
     const templateContent = getPostTemplate();
     
     // Replace placeholders
+    const authorName = postData.authorName || postData.authorUsername || 'Anonymous';
+
     const htmlContent = templateContent
         .replace(/\{\{POST_TITLE\}\}/g, escapeHtml(postData.title))
         .replace(/\{\{POST_TITLE_JSON\}\}/g, JSON.stringify(postData.title))
@@ -546,7 +577,8 @@ function generatePostHTMLFile(postData) {
         .replace(/\{\{POST_CANONICAL_URL\}\}/g, canonicalUrl)
         .replace(/\{\{POST_OG_VIDEO\}\}/g, ogVideoTags)
         .replace(/\{\{POST_VIDEO_STRUCTURED_DATA\}\}/g, videoStructuredData)
-        .replace(/\{\{POST_ID\}\}/g, postData.id);
+        .replace(/\{\{POST_ID\}\}/g, postData.id)
+        .replace(/\{\{POST_AUTHOR\}\}/g, escapeHtml(authorName));
     
     // Write file
     fs.writeFileSync(filepath, htmlContent, 'utf8');
@@ -609,6 +641,10 @@ if (require.main === module) {
 }
 
 module.exports = { generatePostHTMLFile, extractYouTubeVideoId, escapeHtml };
+
+
+
+
 
 
 

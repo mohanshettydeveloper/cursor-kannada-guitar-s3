@@ -1,5 +1,22 @@
 // Blog Application JavaScript
 
+function isFacebookVideoUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return false;
+    }
+    
+    const normalizedUrl = url.trim().toLowerCase();
+    const facebookPatterns = [
+        /facebook\.com\/watch\/?\?v=[\w-]+/,
+        /facebook\.com\/.+\/videos\/[\w-]+/,
+        /facebook\.com\/video\.php\?v=[\w-]+/,
+        /facebook\.com\/story\.php\?story_fbid=[\w-]+/,
+        /fb\.watch\/[\w-]+/
+    ];
+    
+    return facebookPatterns.some(pattern => pattern.test(normalizedUrl));
+}
+
 class BlogApp {
     constructor() {
         this.posts = this.loadPosts();
@@ -36,9 +53,48 @@ class BlogApp {
     }
 
 
+    // Detect video platform type
+    getVideoType(url) {
+        if (!url || typeof url !== 'string') {
+            return null;
+        }
+        
+        url = url.trim();
+        const lowerUrl = url.toLowerCase();
+        
+        if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+            return 'youtube';
+        } else if (lowerUrl.includes('instagram.com') && (lowerUrl.includes('/p/') || lowerUrl.includes('/reel/') || lowerUrl.includes('/tv/'))) {
+            return 'instagram';
+        } else if (isFacebookVideoUrl(lowerUrl)) {
+            return 'facebook';
+        }
+        
+        return null;
+    }
+
+    // Validate video URL (supports YouTube, Instagram, Facebook)
+    isValidVideoUrl(url) {
+        if (!url || typeof url !== 'string') {
+            return false;
+        }
+        
+        const videoType = this.getVideoType(url);
+        
+        switch (videoType) {
+            case 'youtube':
+                return !!this.extractYouTubeVideoId(url);
+            case 'instagram':
+                return !!this.extractInstagramId(url);
+            case 'facebook':
+                return isFacebookVideoUrl(url);
+            default:
+                return false;
+        }
+    }
+
     isValidYouTubeUrl(url) {
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+/;
-        return youtubeRegex.test(url);
+        return this.getVideoType(url) === 'youtube';
     }
 
     extractYouTubeVideoId(url) {
@@ -60,6 +116,30 @@ class BlogApp {
         for (const pattern of patterns) {
             const match = url.match(pattern);
             if (match && match[1] && match[1].length === 11) {
+                return match[1];
+            }
+        }
+        
+        return null;
+    }
+
+    // Extract Instagram post/reel ID
+    extractInstagramId(url) {
+        if (!url || typeof url !== 'string') {
+            return null;
+        }
+        
+        url = url.trim();
+        
+        // Instagram URL patterns: instagram.com/p/CODE, instagram.com/reel/CODE, instagram.com/tv/CODE
+        const patterns = [
+            /instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/,
+            /instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)\/?/
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
                 return match[1];
             }
         }
@@ -121,10 +201,18 @@ class BlogApp {
         
         // Bind delete events
         this.bindDeleteEvents();
+        
+        // Initialize comments for all posts
+        if (window.commentsManager && window.renderComments && window.renderCommentForm) {
+            this.posts.forEach(post => {
+                window.renderComments(post.id);
+                window.renderCommentForm(post.id);
+            });
+        }
     }
 
     createPostHTML(post) {
-        const date = new Date(post.date).toLocaleDateString('en-US', {
+        const date = new Date(post.date || Date.now()).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -132,17 +220,30 @@ class BlogApp {
             minute: '2-digit'
         });
 
+        const authorName = this.escapeHtml(
+            (post.authorName && post.authorName.trim()) ||
+            (post.authorUsername && post.authorUsername.trim()) ||
+            'Anonymous'
+        );
+
         const videoHTML = post.youtubeUrl ? this.createVideoHTML(post.youtubeUrl) : '';
         const tagsHTML = post.tags ? this.createTagsHTML(post.tags) : '';
         
         // Create link to individual post HTML file if it exists
         const postLink = post.htmlFile ? `<a href="${post.htmlFile}" class="post-link" target="_blank">📄 View Full Post</a>` : '';
 
+        // Get comment count
+        const commentCount = window.commentsManager ? window.commentsManager.getCommentCount(post.id) : 0;
+
         return `
             <article class="post-card" data-id="${post.id}">
                 <div class="post-header">
                     <h3 class="post-title">${this.escapeHtml(post.title)}</h3>
-                    <span class="post-date">${date}</span>
+                    <div class="post-meta">
+                        <span class="post-author">👤 ${authorName}</span>
+                        <span class="post-meta-dot">•</span>
+                        <span class="post-date">${date}</span>
+                    </div>
                 </div>
                 
                 ${videoHTML}
@@ -153,19 +254,50 @@ class BlogApp {
                 
                 <div class="post-actions">
                     ${postLink}
+                    <button class="comment-toggle-btn" onclick="toggleComments('${post.id}')" aria-label="Toggle comments">
+                        💬 <span data-comment-count="${post.id}">${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}</span>
+                    </button>
+                </div>
+                
+                <div class="comments-section" id="comments-section-${post.id}" style="display: none;">
+                    <div class="comment-form-container" id="comment-form-container-${post.id}"></div>
+                    <div class="comments-container" id="comments-container-${post.id}"></div>
                 </div>
             </article>
         `;
     }
 
-    createVideoHTML(youtubeUrl) {
-        const videoId = this.extractYouTubeVideoId(youtubeUrl);
+    createVideoHTML(videoUrl) {
+        if (!videoUrl || typeof videoUrl !== 'string') {
+            return '';
+        }
+        
+        const videoType = this.getVideoType(videoUrl);
+        
+        if (!videoType) {
+            console.warn('Unsupported video URL:', videoUrl);
+            return '';
+        }
+        
+        switch (videoType) {
+            case 'youtube':
+                return this.createYouTubeEmbed(videoUrl);
+            case 'instagram':
+                return this.createInstagramEmbed(videoUrl);
+            case 'facebook':
+                return this.createFacebookEmbed(videoUrl);
+            default:
+                return '';
+        }
+    }
+
+    createYouTubeEmbed(url) {
+        const videoId = this.extractYouTubeVideoId(url);
         if (!videoId || videoId.length !== 11) {
             console.warn('Invalid YouTube video ID:', videoId);
             return '';
         }
 
-        // Use simple embed URL without extra parameters to avoid Error 153
         const embedUrl = `https://www.youtube.com/embed/${videoId}`;
         
         return `
@@ -176,6 +308,75 @@ class BlogApp {
                     frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                     allowfullscreen>
+                </iframe>
+            </div>
+        `;
+    }
+
+    createInstagramEmbed(url) {
+        const postId = this.extractInstagramId(url);
+        if (!postId) {
+            console.warn('Invalid Instagram post ID:', postId);
+            return '';
+        }
+
+        // Clean URL and construct embed URL
+        let cleanUrl = url.trim();
+        if (!cleanUrl.startsWith('http')) {
+            cleanUrl = 'https://' + cleanUrl;
+        }
+        
+        // Extract the type (p, reel, tv) and code
+        const match = cleanUrl.match(/instagram\.com\/(p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+        if (!match) {
+            return '';
+        }
+        
+        const type = match[1];
+        const code = match[2];
+        const embedUrl = `https://www.instagram.com/${type}/${code}/embed/`;
+        
+        // Use Instagram's official embed iframe
+        return `
+            <div class="post-video instagram-video">
+                <iframe 
+                    src="${embedUrl}"
+                    title="Instagram post"
+                    frameborder="0"
+                    allow="encrypted-media"
+                    scrolling="no"
+                    style="max-width: 540px; width: 100%; min-width: 326px; margin: 0 auto; display: block;">
+                </iframe>
+            </div>
+        `;
+    }
+
+    createFacebookEmbed(url) {
+        if (!isFacebookVideoUrl(url)) {
+            console.warn('Invalid Facebook video URL:', url);
+            return '';
+        }
+
+        // Clean and encode the Facebook video URL
+        let cleanUrl = url.trim();
+        if (!cleanUrl.startsWith('http')) {
+            cleanUrl = 'https://' + cleanUrl;
+        }
+        
+        // Facebook video embed URL format using their plugin
+        // This works for all Facebook video URL formats
+        const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(cleanUrl)}&show_text=0&width=500&height=281`;
+        
+        return `
+            <div class="post-video facebook-video">
+                <iframe 
+                    src="${embedUrl}" 
+                    title="Facebook video player" 
+                    frameborder="0" 
+                    allow="encrypted-media" 
+                    allowfullscreen
+                    scrolling="no"
+                    style="max-width: 100%; width: 100%; border: none; overflow: hidden;">
                 </iframe>
             </div>
         `;
@@ -450,7 +651,7 @@ class BlogApp {
     // Footer stats
     updateFooterStats() {
         const totalPosts = this.posts.length;
-        const totalVideos = this.posts.filter(post => post.youtubeUrl).length;
+        const totalVideos = this.posts.filter(post => post.youtubeUrl && this.isValidVideoUrl(post.youtubeUrl)).length;
         const allTags = new Set();
         
         this.posts.forEach(post => {
@@ -508,6 +709,27 @@ Built with ❤️ for the Kannada guitar community!
 
 // Initialize the blog app when the page loads
 let blogApp;
+// Toggle comments section for a post
+function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-section-${postId}`);
+    if (!commentsSection) return;
+    
+    const isVisible = commentsSection.style.display !== 'none';
+    commentsSection.style.display = isVisible ? 'none' : 'block';
+    
+    // If opening comments, scroll to comments section
+    if (!isVisible) {
+        setTimeout(() => {
+            commentsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+// Make toggleComments globally available
+if (typeof window !== 'undefined') {
+    window.toggleComments = toggleComments;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     blogApp = new BlogApp();
     
@@ -544,10 +766,35 @@ let secureLastSubmissionTime = 0;
 const SECURE_RATE_LIMIT_WINDOW = 300000; // 5 minutes
 const SECURE_MAX_SUBMISSIONS_PER_WINDOW = 2;
 
-// YouTube URL validation for secure form
+// Video URL validation for secure form (supports YouTube, Instagram, Facebook)
+function isValidSecureVideoUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return false;
+    }
+    
+    url = url.trim().toLowerCase();
+    
+    // Check for YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        return /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+/.test(url);
+    }
+    
+    // Check for Instagram (posts, reels, TV)
+    if (url.includes('instagram.com') && (url.includes('/p/') || url.includes('/reel/') || url.includes('/tv/'))) {
+        return /instagram\.com\/(p|reel|tv)\/[a-zA-Z0-9_-]+/.test(url);
+    }
+    
+    // Check for Facebook videos
+    if (isFacebookVideoUrl(url)) {
+        return true;
+    }
+    
+    return false;
+}
+
+// Backward compatibility
 function isValidSecureYouTubeUrl(url) {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+/;
-    return youtubeRegex.test(url);
+    return isValidSecureVideoUrl(url);
 }
 
 // Standalone function to extract YouTube video ID (used in generatePostHTMLFile)
@@ -606,28 +853,12 @@ async function generatePostHTMLFile(postData) {
         minute: '2-digit'
     });
     
-    // Generate video HTML if YouTube URL exists
+    // Generate video HTML if video URL exists (YouTube, Instagram, or Facebook)
     let videoHTML = '';
     if (postData.youtubeUrl) {
-        const videoId = extractYouTubeVideoId(postData.youtubeUrl);
-        if (videoId && videoId.length === 11) {
-            // Validate video ID is 11 characters (YouTube standard)
-            // For blob URLs (generated HTML files), use a simpler embed URL
-            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-            videoHTML = `
-                <div class="post-video">
-                    <iframe 
-                        src="${embedUrl}" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            `;
-        } else {
-            console.warn('Invalid YouTube video ID extracted:', videoId);
-        }
+        // Create a temporary blog app instance to use its video embedding methods
+        const tempApp = new BlogApp();
+        videoHTML = tempApp.createVideoHTML(postData.youtubeUrl);
     }
     
     // Generate tags HTML if tags exist
@@ -680,6 +911,8 @@ async function generatePostHTMLFile(postData) {
     // Read the template file content (we'll create this as a string for now)
     const templateContent = getPostTemplate();
     
+    const authorName = postData.authorName || postData.authorUsername || 'Anonymous';
+    
     // Replace placeholders with actual content
     const htmlContent = templateContent
         .replace(/\{\{POST_TITLE\}\}/g, escapeHtml(postData.title))
@@ -693,7 +926,8 @@ async function generatePostHTMLFile(postData) {
         .replace(/\{\{POST_CANONICAL_URL\}\}/g, canonicalUrl)
         .replace(/\{\{POST_OG_VIDEO\}\}/g, ogVideoTags)
         .replace(/\{\{POST_VIDEO_STRUCTURED_DATA\}\}/g, videoStructuredData)
-        .replace(/\{\{POST_ID\}\}/g, postData.id);
+        .replace(/\{\{POST_ID\}\}/g, postData.id)
+        .replace(/\{\{POST_AUTHOR\}\}/g, escapeHtml(authorName));
     
     // Create and save the HTML file to guitartabs folder
     try {
@@ -791,7 +1025,7 @@ function getPostTemplate() {
     <!-- SEO Meta Tags -->
     <meta name="description" content="{{POST_DESCRIPTION}} - Kannada Guitar community for learning guitar in Kannada language. ಕನ್ನಡ ಗಿಟಾರ್ ಸಮುದಾಯ.">
     <meta name="keywords" content="{{POST_KEYWORDS}}">
-    <meta name="author" content="Kannada Guitar Community">
+    <meta name="author" content="{{POST_AUTHOR}}">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
     <meta name="bingbot" content="index, follow">
@@ -816,8 +1050,8 @@ function getPostTemplate() {
     <meta name="twitter:image" content="https://kannadaguitar.com/images/kannada-guitar-twitter.jpg">
     
     <!-- Additional SEO Meta Tags -->
-    <meta name="theme-color" content="#ff6b35">
-    <meta name="msapplication-TileColor" content="#ff6b35">
+    <meta name="theme-color" content="#d7263d">
+    <meta name="msapplication-TileColor" content="#d7263d">
     <meta name="application-name" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -833,7 +1067,7 @@ function getPostTemplate() {
     
     <!-- Article Meta Tags -->
     <meta property="article:published_time" content="{{POST_DATE_ISO}}">
-    <meta property="article:author" content="Kannada Guitar Community">
+    <meta property="article:author" content="{{POST_AUTHOR}}">
     <meta property="article:section" content="Guitar Lessons">
     <meta property="article:tag" content="Kannada Guitar">
     <meta property="article:tag" content="ಕನ್ನಡ ಗಿಟಾರ್">
@@ -849,9 +1083,8 @@ function getPostTemplate() {
         "datePublished": "{{POST_DATE_ISO}}",
         "dateModified": "{{POST_DATE_ISO}}",
         "author": {
-            "@type": "Organization",
-            "name": "Kannada Guitar Community",
-            "url": "https://kannadaguitar.com"
+            "@type": "Person",
+            "name": "{{POST_AUTHOR}}"
         },
         "publisher": {
             "@type": "Organization",
@@ -892,26 +1125,43 @@ function getPostTemplate() {
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             border: 1px solid #e9ecef;
         }
-        .post-meta {
+        .post-header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid #e9ecef;
         }
+        .post-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+        .post-author {
+            font-weight: 600;
+            color: #d7263d;
+        }
+        .post-meta-dot {
+            color: #adb5bd;
+        }
         .post-date {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         .back-link {
-            color: #ff6b35;
+            color: #d7263d;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
         .back-link:hover {
-            color: #f7931e;
+            color: #ffd447;
         }
         .post-content {
             line-height: 1.8;
@@ -937,7 +1187,7 @@ function getPostTemplate() {
             margin-top: 2rem;
         }
         .tag {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            background: linear-gradient(135deg, #d7263d 0%, #ffd447 100%);
             color: white;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -961,12 +1211,12 @@ function getPostTemplate() {
             display: inline-block;
         }
         .action-btn.primary {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            background: linear-gradient(135deg, #d7263d 0%, #ffd447 100%);
             color: white;
         }
         .action-btn.primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 5px 15px rgba(215, 38, 61, 0.38);
         }
         .action-btn.secondary {
             background: #6c757d;
@@ -983,11 +1233,20 @@ function getPostTemplate() {
             border-color: #404040;
             color: #e0e0e0;
         }
-        .dark-theme .post-meta {
+        .dark-theme .post-header-bar {
             border-bottom-color: #555;
         }
         .dark-theme .post-date {
-            color: #999;
+            color: #adb5bd;
+        }
+        .dark-theme .post-meta {
+            color: #adb5bd;
+        }
+        .dark-theme .post-author {
+            color: #ffd447;
+        }
+        .dark-theme .post-meta-dot {
+            color: #666;
         }
         .dark-theme .post-content {
             color: #d0d0d0;
@@ -1001,7 +1260,7 @@ function getPostTemplate() {
                 padding: 2rem;
                 margin: 1rem;
             }
-            .post-meta {
+            .post-header-bar {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
@@ -1058,9 +1317,13 @@ function getPostTemplate() {
         <div class="container">
             <section class="post-page">
                 <div class="post-container">
-                    <div class="post-meta">
+                    <div class="post-header-bar">
                         <a href="../index.html" class="back-link">← Back to All Posts</a>
-                        <span class="post-date">{{POST_DATE}}</span>
+                        <div class="post-meta">
+                            <span class="post-author">👤 {{POST_AUTHOR}}</span>
+                            <span class="post-meta-dot">•</span>
+                            <span class="post-date">{{POST_DATE}}</span>
+                        </div>
                     </div>
                     
                     <h1 class="post-title">{{POST_TITLE}} - Kannada Guitar</h1>
@@ -1312,9 +1575,9 @@ function validateSecureForm(formData) {
         return false;
     }
 
-    // Validate YouTube URL if provided
-    if (youtubeUrl && !isValidSecureYouTubeUrl(youtubeUrl)) {
-        showSecureErrorMessage('Please enter a valid YouTube URL.');
+    // Validate video URL if provided (YouTube, Instagram, or Facebook)
+    if (youtubeUrl && !isValidSecureVideoUrl(youtubeUrl)) {
+        showSecureErrorMessage('Please enter a valid YouTube, Instagram, or Facebook video URL.');
         return false;
     }
 
@@ -1472,6 +1735,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 console.log('Form submitted');
                 
+                // Check if user is logged in
+                const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+                if (!currentUser) {
+                    showSecureErrorMessage('You must be logged in to create a post. Please login and try again.');
+                    closeAddPostModal();
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    return;
+                }
+                
                 // Check rate limit
                 if (!checkSecureRateLimit()) {
                     console.log('Rate limit exceeded');
@@ -1505,13 +1779,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 secureLastSubmissionTime = Date.now();
 
                 // Create post data
+                const authorName = (currentUser.fullName && currentUser.fullName.trim()) ||
+                    (currentUser.username && currentUser.username.trim()) ||
+                    (currentUser.email && currentUser.email.trim()) ||
+                    'Anonymous';
                 const postData = {
                     id: Date.now().toString(),
                     title: formData.get('title').trim(),
                     content: formData.get('content').trim(),
                     youtubeUrl: formData.get('youtubeUrl').trim(),
                     tags: formData.get('tags').trim(),
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    authorId: currentUser.id || currentUser.userId || currentUser.sub || null,
+                    authorUsername: currentUser.username || currentUser.email || null,
+                    authorName: authorName
                 };
 
                 // Add post using existing blog app functionality
