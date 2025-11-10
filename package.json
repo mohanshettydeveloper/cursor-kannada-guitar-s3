@@ -30,8 +30,6 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "devDependencies": {},
-  "dependencies": {},
   "browserslist": [
     "> 1%",
     "last 2 versions",

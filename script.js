@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 id: 'sample1',
                 title: 'Welcome to Kannada Guitar!',
-                content: 'Welcome to Kannada Guitar! ಸ್ವಾಗತ! 🎸\n\nThis is your first blog post where you can share your guitar journey, music videos, and musical thoughts with fellow Kannadigas.\n\nYou can add text content and YouTube videos to document your musical progress and share your passion for guitar with the Kannada community.\n\nJoin us in growing Kannada music and guitar culture. Try adding a new post using the form above!',
+                content: 'Welcome to Kannada Guitar! ಸ್ವಾಗತ!',
                 youtubeUrl: '',
                 // tags: 'welcome, introduction, guitar, music, kannada, community',
                 date: new Date().toISOString()

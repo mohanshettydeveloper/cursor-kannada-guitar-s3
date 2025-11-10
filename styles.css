@@ -851,11 +851,15 @@ body::before {
 }
 
 .seo-intro p {
-    color: #495057;
+    color: whitesmoke;
     font-size: 1.1rem;
     line-height: 1.7;
     margin: 0;
     font-weight: 500;
+}
+
+.dark-theme .seo-intro p {
+    color: #f3f4f6;
 }
 
 .posts-container {
