@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Kannada Guitar Post JSON</title>
+    <link rel="icon" type="image/png" href="guitar_black.PNG">
+    <link rel="apple-touch-icon" href="guitar_black.PNG">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95) 0%, rgba(36, 12, 30, 0.95) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            color: #f7f9fc;
+        }
+
+        .create-post-wrapper {
+            max-width: 960px;
+            width: 100%;
+            background: rgba(12, 12, 26, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(14px);
+        }
+
+        .create-post-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .create-post-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin-bottom: 0.5rem;
+            color: #ffd447;
+        }
+
+        .create-post-header p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .create-post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .create-post-form,
+        .json-output-panel {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: clamp(1.25rem, 3vw, 1.75rem);
+        }
+
+        .create-post-form h2,
+        .json-output-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffd447;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(12, 12, 26, 0.65);
+            color: #f7f9fc;
+            font-size: 1rem;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 212, 71, 0.8);
+            box-shadow: 0 0 0 3px rgba(255, 212, 71, 0.2);
+            background: rgba(12, 12, 26, 0.9);
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.9rem 1.6rem;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd447 0%, #ffa534 100%);
+            color: #241a00;
+            box-shadow: 0 12px 25px rgba(255, 212, 71, 0.35);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #ffd447;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .json-output {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95rem;
+            background: rgba(12, 12, 26, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #f7f9fc;
+            min-height: 260px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-y: auto;
+        }
+
+        .status-message {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: rgba(144, 238, 144, 0.9);
+            min-height: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 0.75rem;
+            }
+
+            .create-post-wrapper {
+                border-radius: 16px;
+            }
+
+            .create-post-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="create-post-wrapper">
+        <header class="create-post-header">
+            <h1>Create Kannada Guitar Post JSON</h1>
+            <p>Fill in the details below and generate a JSON document you can save or import into the Kannada Guitar posts data.</p>
+        </header>
+
+        <section class="create-post-grid">
+            <form id="postJsonForm" class="create-post-form">
+                <h2>Post Details</h2>
+
+                <div class="form-group">
+                    <label for="postTitle">Title *</label>
+                    <input id="postTitle" name="title" type="text" required maxlength="120" placeholder="Enter a descriptive title">
+                </div>
+
+                <div class="form-group">
+                    <label for="postAuthor">Author Name</label>
+                    <input id="postAuthor" name="authorName" type="text" maxlength="80" placeholder="Kannada Guitar Member">
+                    <span class="form-hint">Optional — defaults to "Anonymous" if left empty.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="postContent">Content *</label>
+                    <textarea id="postContent" name="content" rows="8" required placeholder="Write your Kannada guitar story or lesson..."></textarea>
+                    <span class="form-hint">Supports Markdown basics. Minimum 20 characters.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="videoUrl">Video URL</label>
+                    <input id="videoUrl" name="youtubeUrl" type="url" placeholder="YouTube, Instagram, or Facebook video URL">
+                    <span class="form-hint">Paste a link to your Kannada guitar performance (optional).</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="postTags">Tags</label>
+                    <input id="postTags" name="tags" type="text" placeholder="e.g. kannada guitar, bhavageethe, lesson">
+                    <span class="form-hint">Comma-separated list to help categorize the post.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="postDate">Date</label>
+                    <input id="postDate" name="date" type="datetime-local">
+                    <span class="form-hint">Defaults to current time if not provided.</span>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Generate JSON</button>
+                    <button type="button" class="btn btn-secondary" id="downloadJsonBtn" disabled>Download JSON</button>
+                    <button type="button" class="btn btn-secondary" id="copyJsonBtn" disabled>Copy JSON</button>
+                </div>
+
+                <div class="status-message" id="statusMessage"></div>
+            </form>
+
+            <aside class="json-output-panel">
+                <h2>Generated JSON</h2>
+                <pre id="jsonOutput" class="json-output">Fill in the form to generate your post JSON 😀</pre>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        const postJsonForm = document.getElementById('postJsonForm');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const downloadBtn = document.getElementById('downloadJsonBtn');
+        const copyBtn = document.getElementById('copyJsonBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        function buildPostJson(formData) {
+            const title = formData.get('title').trim();
+            const authorName = formData.get('authorName').trim();
+            const content = formData.get('content').trim();
+            const youtubeUrl = formData.get('youtubeUrl').trim();
+            const tagsRaw = formData.get('tags').trim();
+            const dateValue = formData.get('date');
+
+            const postData = {
+                id: `post-${Date.now()}`,
+                title,
+                content,
+                date: dateValue ? new Date(dateValue).toISOString() : new Date().toISOString(),
+            };
+
+            if (authorName) {
+                postData.authorName = authorName;
+            }
+
+            if (youtubeUrl) {
+                postData.youtubeUrl = youtubeUrl;
+            }
+
+            if (tagsRaw) {
+                postData.tags = tagsRaw
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(Boolean)
+                    .join(', ');
+            }
+
+            return postData;
+        }
+
+        function enableActions() {
+            downloadBtn.disabled = false;
+            copyBtn.disabled = false;
+        }
+
+        function disableActions() {
+            downloadBtn.disabled = true;
+            copyBtn.disabled = true;
+        }
+
+        function showStatus(message, success = true) {
+            statusMessage.textContent = message;
+            statusMessage.style.color = success ? 'rgba(144, 238, 144, 0.9)' : 'rgba(255, 128, 128, 0.9)';
+        }
+
+        postJsonForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            showStatus('');
+
+            const formData = new FormData(postJsonForm);
+            const content = formData.get('content').trim();
+
+            if (content.length < 20) {
+                showStatus('Content must be at least 20 characters long.', false);
+                disableActions();
+                return;
+            }
+
+            const postJson = buildPostJson(formData);
+            const jsonString = JSON.stringify(postJson, null, 2);
+            jsonOutput.textContent = jsonString;
+            enableActions();
+            showStatus('Post JSON generated successfully!');
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const jsonText = jsonOutput.textContent.trim();
+            if (!jsonText || jsonText.startsWith('Fill in the form')) {
+                showStatus('Nothing to copy yet.', false);
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(jsonText);
+                showStatus('JSON copied to clipboard!');
+            } catch (error) {
+                showStatus('Unable to copy JSON automatically. Please select and copy manually.', false);
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const jsonText = jsonOutput.textContent.trim();
+            if (!jsonText || jsonText.startsWith('Fill in the form')) {
+                showStatus('Nothing to download yet.', false);
+                return;
+            }
+
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const generatedId = JSON.parse(jsonText).id || `post-${Date.now()}`;
+            link.href = url;
+            link.download = `${generatedId}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showStatus('JSON file downloaded.');
+        });
+    </script>
+</body>
+</html>
+
+

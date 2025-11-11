@@ -1,0 +1,9 @@
+{
+  "id": "post-2025-bhavagita1",
+  "title": "Bhavageethe Fingerstyle Tutorial",
+  "authorName": "Mohan",
+  "content": "In this lesson we’ll break down the bhavageethe fingerstyle",
+  "youtubeUrl": "https://www.youtube.com/watch?v=vtsAIngw_4I",
+  "tags": "kannada guitar, movie",
+  "date": "2024-02-11T10:30:00.000Z"
+}

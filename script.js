@@ -1,4 +1,5 @@
 // Blog Application JavaScript
+const NEW_POSTS_DIR = 'newposts/';
 
 function isFacebookVideoUrl(url) {
     if (!url || typeof url !== 'string') {
@@ -186,25 +187,41 @@ class BlogApp {
 
     renderPosts() {
         const container = document.getElementById('postsContainer');
+        if (!container) return;
         
-        if (this.posts.length === 0) {
+        const sortedPosts = Array.isArray(this.posts) ? [...this.posts] : [];
+        sortedPosts.sort((a, b) => {
+            const dateA = new Date(a.date || 0).getTime();
+            const dateB = new Date(b.date || 0).getTime();
+            return dateB - dateA;
+        });
+        
+        if (sortedPosts.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <h3>No posts yet</h3>
                     <p>Create your first post using the form above!</p>
                 </div>
             `;
+            this.renderArchives([]);
             return;
         }
 
-        container.innerHTML = this.posts.map(post => this.createPostHTML(post)).join('');
+        const visiblePosts = sortedPosts.slice(0, 3);
+        const postsHtml = visiblePosts.map(post => this.createPostHTML(post)).join('');
+        const archiveNote = sortedPosts.length > visiblePosts.length
+            ? `<div class="more-posts-note">Looking for older posts? Browse the archive by month to find the rest.</div>`
+            : '';
+
+        container.innerHTML = `${postsHtml}${archiveNote}`;
         
         // Bind delete events
         this.bindDeleteEvents();
+        this.renderArchives(sortedPosts);
         
         // Initialize comments for all posts
         if (window.commentsManager && window.renderComments && window.renderCommentForm) {
-            this.posts.forEach(post => {
+            visiblePosts.forEach(post => {
                 window.renderComments(post.id);
                 window.renderCommentForm(post.id);
             });
@@ -522,19 +539,110 @@ class BlogApp {
 
     renderFilteredPosts(posts) {
         const container = document.getElementById('postsContainer');
+        if (!container) return;
+
+        const sortedPosts = Array.isArray(posts) ? [...posts] : [];
+        sortedPosts.sort((a, b) => {
+            const dateA = new Date(a.date || 0).getTime();
+            const dateB = new Date(b.date || 0).getTime();
+            return dateB - dateA;
+        });
         
-        if (posts.length === 0) {
+        if (sortedPosts.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <h3>No posts found</h3>
                     <p>Try adjusting your search terms or create a new post!</p>
                 </div>
             `;
+            this.renderArchives([]);
             return;
         }
 
-        container.innerHTML = posts.map(post => this.createPostHTML(post)).join('');
+        container.innerHTML = sortedPosts.map(post => this.createPostHTML(post)).join('');
         this.bindDeleteEvents();
+        this.renderArchives(sortedPosts);
+    }
+
+    renderArchives(posts = this.posts) {
+        const archivesContainer = document.getElementById('archivesList');
+        if (!archivesContainer) return;
+
+        if (!Array.isArray(posts) || posts.length === 0) {
+            archivesContainer.innerHTML = `<p class="archive-empty">No posts yet.</p>`;
+            return;
+        }
+
+        const archivesMap = new Map();
+        posts.forEach(post => {
+            const postDate = new Date(post.date || Date.now());
+            if (Number.isNaN(postDate.getTime())) {
+                return;
+            }
+            const key = `${postDate.getFullYear()}-${String(postDate.getMonth() + 1).padStart(2, '0')}`;
+            if (!archivesMap.has(key)) {
+                archivesMap.set(key, []);
+            }
+            archivesMap.get(key).push(post);
+        });
+
+        if (archivesMap.size === 0) {
+            archivesContainer.innerHTML = `<p class="archive-empty">No posts yet.</p>`;
+            return;
+        }
+
+        const sortedKeys = Array.from(archivesMap.keys()).sort((a, b) => b.localeCompare(a));
+
+        const archiveMarkup = sortedKeys.map(key => {
+            const [yearStr, monthStr] = key.split('-');
+            const monthDate = new Date(Number(yearStr), Number(monthStr) - 1, 1);
+            const label = Number.isNaN(monthDate.getTime())
+                ? key
+                : monthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+            const postsForMonth = archivesMap.get(key).slice().sort((a, b) => {
+                const dateA = new Date(a.date || 0).getTime();
+                const dateB = new Date(b.date || 0).getTime();
+                return dateB - dateA;
+            });
+
+            const postsHtml = postsForMonth.map(post => `
+                <a href="#" class="archive-post-link" data-post-id="${post.id}">
+                    ${this.escapeHtml(post.title)}
+                </a>
+            `).join('');
+
+            return `
+                <div class="archive-month">
+                    <div class="archive-month-title">${this.escapeHtml(label)}<span>${postsForMonth.length}</span></div>
+                    <div class="archive-posts">
+                        ${postsHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        archivesContainer.innerHTML = archiveMarkup;
+    }
+
+    scrollToPost(postId) {
+        if (!postId) return;
+        const postElement = document.querySelector(`.post-card[data-id="${postId}"]`);
+
+        if (postElement) {
+            postElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            if (postElement._highlightTimeout) {
+                clearTimeout(postElement._highlightTimeout);
+            }
+            postElement.classList.add('highlight');
+            postElement._highlightTimeout = setTimeout(() => {
+                postElement.classList.remove('highlight');
+                postElement._highlightTimeout = null;
+            }, 2000);
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     // Navigation handling
@@ -738,24 +846,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Load post navigation from localStorage
     loadPostNavigation();
+    loadNewPostsFromFolder();
+    setupArchiveInteractions();
     
-    // Add some sample posts if none exist
-    if (blogApp.posts.length === 0) {
-        const samplePosts = [
-            {
-                id: 'sample1',
-                title: 'Welcome to Kannada Guitar!',
-                content: 'Welcome to Kannada Guitar! ಸ್ವಾಗತ!',
-                youtubeUrl: '',
-                // tags: 'welcome, introduction, guitar, music, kannada, community',
-                date: new Date().toISOString()
-            }
-        ];
-        
-        blogApp.posts = samplePosts;
-        blogApp.savePosts();
-        blogApp.renderPosts();
-    }
+    // If no posts exist, leave the interface empty so the user can start fresh.
 });
 
 
@@ -1294,7 +1388,6 @@ function getPostTemplate() {
                             <a href="../index.html#posts" class="nav-link">Posts ▼</a>
                             <ul class="dropdown-menu">
                                 <li><a href="../index.html#posts" class="dropdown-link">View All Posts</a></li>
-                                <li><a href="#" class="dropdown-link" onclick="openAddPostModal()">Add New Post</a></li>
                             </ul>
                         </li>
                         <li><a href="../about.html" class="nav-link">About</a></li>
@@ -1968,23 +2061,190 @@ function loadPostNavigation() {
     
     // Add saved post links
     navigationData.forEach(postData => {
-        const postLink = document.createElement('li');
-        postLink.innerHTML = `
-            <a href="${postData.htmlFile}" class="dropdown-link" target="_blank">
-                📄 ${postData.title}
-            </a>
-        `;
-        
-        // Insert after the "Recent Posts" section title
-        const sectionTitle = postsDropdown.querySelector('.dropdown-section-title');
-        if (sectionTitle) {
-            postsDropdown.insertBefore(postLink, sectionTitle.nextSibling);
-        } else {
-            postsDropdown.appendChild(postLink);
+        // Skip rendering if dropdown was removed
+        if (!postsDropdown) {
+            return;
         }
     });
     
     console.log(`Loaded ${navigationData.length} posts to navigation menu`);
+}
+
+async function fetchNewPostsFileList() {
+    if (Array.isArray(window.NEW_POST_FILES) && window.NEW_POST_FILES.length > 0) {
+        return window.NEW_POST_FILES;
+    }
+
+    const manifestCandidates = [
+        `${NEW_POSTS_DIR}newposts-index.json`,
+        `${NEW_POSTS_DIR}manifest.json`,
+        `${NEW_POSTS_DIR}posts.json`
+    ];
+
+    for (const manifestUrl of manifestCandidates) {
+        try {
+            const manifestResponse = await fetch(manifestUrl, { cache: 'no-store' });
+            if (manifestResponse.ok) {
+                const manifestData = await manifestResponse.json();
+                if (Array.isArray(manifestData)) {
+                    return manifestData;
+                }
+                if (manifestData && Array.isArray(manifestData.files)) {
+                    return manifestData.files;
+                }
+            }
+        } catch (error) {
+            if (error?.name !== 'TypeError') {
+                console.warn(`Unable to load newposts manifest ${manifestUrl}:`, error);
+            }
+        }
+    }
+
+    try {
+        const directoryResponse = await fetch(NEW_POSTS_DIR, { cache: 'no-store' });
+        if (directoryResponse.ok) {
+            const directoryHtml = await directoryResponse.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(directoryHtml, 'text/html');
+            const linkHrefs = Array.from(doc.querySelectorAll('a[href]'))
+                .map(link => link.getAttribute('href'))
+                .filter(href => href && href.toLowerCase().endsWith('.txt'));
+
+            if (linkHrefs.length > 0) {
+                return linkHrefs.map(href => {
+                    if (href.startsWith('http://') || href.startsWith('https://')) {
+                        return href;
+                    }
+                    if (href.startsWith('/')) {
+                        return `${NEW_POSTS_DIR}${href.slice(1)}`;
+                    }
+                    return `${NEW_POSTS_DIR}${href}`;
+                });
+            }
+        }
+    } catch (error) {
+        console.warn('Unable to list newposts directory:', error);
+    }
+
+    return [];
+}
+
+async function loadPostFromFile(fileEntry) {
+    try {
+        const entryPath = typeof fileEntry === 'string'
+            ? fileEntry
+            : fileEntry?.path || fileEntry?.file || '';
+
+        if (!entryPath) {
+            return null;
+        }
+
+        const normalizedPath = entryPath.startsWith('http://') || entryPath.startsWith('https://')
+            ? entryPath
+            : `${NEW_POSTS_DIR}${entryPath.replace(/^\.?\/?newposts\/?/, '')}`;
+
+        const response = await fetch(normalizedPath, { cache: 'no-store' });
+        if (!response.ok) {
+            console.warn(`Failed to load post file ${normalizedPath}: ${response.status}`);
+            return null;
+        }
+
+        const rawText = (await response.text()).trim();
+        if (!rawText) {
+            return null;
+        }
+
+        const parsed = JSON.parse(rawText);
+        if (!parsed || typeof parsed !== 'object') {
+            return null;
+        }
+
+        if (!parsed.title || !parsed.content) {
+            console.warn(`Post missing required fields in ${normalizedPath}.`);
+            return null;
+        }
+
+        if (!parsed.id) {
+            parsed.id = `newpost-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        }
+
+        parsed.date = parsed.date ? new Date(parsed.date).toISOString() : new Date().toISOString();
+
+        return parsed;
+    } catch (error) {
+        console.error('Error loading post file:', fileEntry, error);
+        return null;
+    }
+}
+
+async function loadNewPostsFromFolder() {
+    if (!window.blogApp) {
+        return;
+    }
+
+    try {
+        const fileEntries = await fetchNewPostsFileList();
+        if (!fileEntries || fileEntries.length === 0) {
+            console.log('No newposts files detected.');
+            return;
+        }
+
+        const loadedPosts = [];
+        for (const entry of fileEntries) {
+            const post = await loadPostFromFile(entry);
+            if (post) {
+                loadedPosts.push(post);
+            }
+        }
+
+        if (loadedPosts.length === 0) {
+            console.log('No valid JSON posts loaded from newposts directory.');
+            return;
+        }
+
+        blogApp.posts = Array.isArray(blogApp.posts) ? blogApp.posts : [];
+        const existingIds = new Set(blogApp.posts.map(post => post.id));
+        let addedCount = 0;
+
+        loadedPosts.forEach(post => {
+            if (!existingIds.has(post.id)) {
+                blogApp.posts.unshift(post);
+                existingIds.add(post.id);
+                addedCount += 1;
+            }
+        });
+
+        if (addedCount > 0) {
+            blogApp.savePosts();
+            blogApp.renderPosts();
+            blogApp.updateFooterStats();
+            console.log(`Loaded ${addedCount} post(s) from newposts directory.`);
+        } else {
+            console.log('All posts from newposts directory were already present.');
+        }
+    } catch (error) {
+        console.error('Unable to load posts from newposts directory:', error);
+    }
+}
+
+function setupArchiveInteractions() {
+    const archivesList = document.getElementById('archivesList');
+    if (!archivesList || archivesList.dataset.bound === 'true') {
+        return;
+    }
+
+    archivesList.addEventListener('click', (event) => {
+        const link = event.target.closest('.archive-post-link');
+        if (!link) return;
+
+        event.preventDefault();
+        const postId = link.dataset.postId;
+        if (window.blogApp && typeof window.blogApp.scrollToPost === 'function') {
+            window.blogApp.scrollToPost(postId);
+        }
+    });
+
+    archivesList.dataset.bound = 'true';
 }
 
 // Expose functions to window object for inline onclick handlers
@@ -2001,6 +2261,11 @@ window.scrollToPosts = scrollToPosts;
 
 // Navigation management
 window.addPostToNavigation = addPostToNavigation;
+window.scrollToPost = (postId) => {
+    if (window.blogApp && typeof window.blogApp.scrollToPost === 'function') {
+        window.blogApp.scrollToPost(postId);
+    }
+};
 
 console.log('Blog app loaded! Available commands:');
 console.log('- blogApp.clearAllPosts() - Clear all posts');

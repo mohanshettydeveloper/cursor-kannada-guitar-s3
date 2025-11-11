@@ -243,20 +243,18 @@ By creating a post, you agree to these terms and confirm your content is appropr
                             <a href="#home" class="nav-link">Posts ▼</a>
                             <ul class="dropdown-menu">
                                 <li><a href="#home" class="dropdown-link">View All Posts</a></li>
-                                <li><a href="#" class="dropdown-link" onclick="event.preventDefault(); openAddPostModal(); return false;">Add New Post</a></li>
                                 <li class="dropdown-separator"></li>
-                                <li class="dropdown-section-title">Recent Posts</li>
                             </ul>
                         </li>
                         <li><a href="about.html" class="nav-link">About</a></li>
                         <li><a href="contact.html" class="nav-link">Contact</a></li>
-                        <li class="nav-dropdown account-dropdown">
+                        <!-- <li class="nav-dropdown account-dropdown">
                             <a href="#" class="nav-link">Account ▼</a>
                             <ul class="dropdown-menu">
                                 <li><a href="login.html" class="dropdown-link">🔐 Login</a></li>
                                 <li><a href="register.html" class="dropdown-link">📝 Register</a></li>
                             </ul>
-                        </li>
+                        </li> -->
                     </ul>
                 </nav>
                 
@@ -285,85 +283,19 @@ By creating a post, you agree to these terms and confirm your content is appropr
             
             <!-- Posts Display -->
             <section id="home" class="posts-section">
-                <h2>Recent Kannada Guitar Posts</h2>
+                <h2>Kannada Guitar Tabs</h2>
                 <div class="seo-intro">
-                    <p>Welcome to the largest Kannada Guitar community! Share your guitar journey, learn from fellow Kannadigas, and discover amazing guitar lessons in Kannada language. Whether you're a beginner or advanced player, join our community of Kannada guitar enthusiasts.</p>
+                    <p>ಕನ್ನಡ ಗಿಟಾರ್ ಉತ್ಸಾಹಿಗಳಿಗಾಗಿ. 
+                        <br>
+                        ಇತರ ಭಾಷೆಗಳಲ್ಲಿ ಹಾಡುಗಳನ್ನು ಕಲಿಯಲು ಹಲವು ಸೈಟ್‌ಗಳಿವೆ ಆದರೆ ನಾನು ಕಲಿಯಲು ಪ್ರಾರಂಭಿಸಿದಾಗ ಕನ್ನಡಕ್ಕಾಗಿ ಯಾವದೂ ಇರಲಿಲ್ಲ. 
+                        ಹಾಗಾಗಿ, ನಾನು ಈ ಸೈಟ್ ಅನ್ನು ರಚಿಸಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ಇತರ ಕನ್ನಡ ಗಿಟಾರ್ ಉತ್ಸಾಹಿಗಳೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ.
+                    </p>
+                    <p>See the posts by month section or search for more videos</p>
                 </div>
                 <div id="postsContainer" class="posts-container">
-                    <article class="post-card" data-id="sample1">
-                        <div class="post-header">
-                            <h3 class="post-title">Welcome to Kannada Guitar!</h3>
-                            <div class="post-meta">
-                                <span class="post-author">👤 Anonymous</span>
-                                <span class="post-meta-dot">•</span>
-                                <span class="post-date">November 10, 2025 at 04:29 PM</span>
-                            </div>
-                        </div>
-                        
-                        
-                        
-                        <div class="post-content">Welcome to Kannada Guitar! ಸ್ವಾಗತ!</div>
-                        
-                        
-                        
-                        <div class="post-actions">
-                            
-                            <button class="comment-toggle-btn" onclick="toggleComments('sample1')" aria-label="Toggle comments">
-                                💬 <span data-comment-count="sample1">0 comments</span>
-                            </button>
-                        </div>
-                        
-                        <div class="comments-section" id="comments-section-sample1" style="display: none;">
-                            <div class="comment-form-container" id="comment-form-container-sample1">
-                    <div class="comment-login-prompt">
-                        <p>Please <a href="login.html">login</a> to add a comment.</p>
-                    </div>
-                    </div>
-                            <div class="comments-container" id="comments-container-sample1">
-                    <div class="comments-empty">
-                        <p>No comments yet. Be the first to comment!</p>
-                    </div>
-                    </div>
-                        </div>
-                    </article>
-                    <article class="post-card" data-id="sample1">
-                        <div class="post-header">
-                            <h3 class="post-title">Welcome to Kannada Guitar3!</h3>
-                            <div class="post-meta">
-                                <span class="post-author">👤 Anonymous</span>
-                                <span class="post-meta-dot">•</span>
-                                <span class="post-date">November 10, 2025 at 04:29 PM</span>
-                            </div>
-                        </div>
-                        
-                        
-                        
-                        <div class="post-content">Welcome to Kannada Guitar3! ಸ್ವಾಗತ!</div>
-                        
-                        
-                        
-                        <div class="post-actions">
-                            
-                            <button class="comment-toggle-btn" onclick="toggleComments('sample1')" aria-label="Toggle comments">
-                                💬 <span data-comment-count="sample1">0 comments</span>
-                            </button>
-                        </div>
-                        
-                        <div class="comments-section" id="comments-section-sample1" style="display: none;">
-                            <div class="comment-form-container" id="comment-form-container-sample1">
-                    <div class="comment-login-prompt">
-                        <p>Please <a href="login.html">login</a> to add a comment.</p>
-                    </div>
-                    </div>
-                            <div class="comments-container" id="comments-container-sample1">
-                    <div class="comments-empty">
-                        <p>No comments yet. Be the first to comment!</p>
-                    </div>
-                    </div>
-                        </div>
-                    </article>
+                    <!-- Posts will be dynamically added here -->
                 </div>
-            </section>
+            </section>  
             
             <!-- Sidebar Ad (Desktop) -->
             <aside class="ad-sidebar">
@@ -405,6 +337,14 @@ By creating a post, you agree to these terms and confirm your content is appropr
                                 <span class="affiliate-badge">New</span>
                             </a>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Archives Section -->
+                <div class="archive-section">
+                    <h3>📅 Posts by Month</h3>
+                    <div id="archivesList" class="archive-list">
+                        <p class="archive-empty">Loading archives…</p>
                     </div>
                 </div>
                 
@@ -542,7 +482,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Kannada Guitar Community</h3>
-                    <p>Join the largest Kannada Guitar community in India! Learn guitar in Kannada language, share your guitar journey, and connect with fellow Kannada guitar enthusiasts. Whether you're looking for guitar lessons in Kannada, guitar tutorials, or want to share your Kannada guitar songs, this is the perfect platform for all Kannadigas passionate about guitar music.</p>
+                    <p>Join the Guitar community for Kannada!. Learn guitar in Kannada language, share your guitar journey, and connect with fellow Kannada guitar enthusiasts. Whether you're looking for guitar lessons in Kannada, guitar tutorials, or want to share your Kannada guitar songs, this is the perfect platform for all Kannadigas passionate about guitar music.</p>
                     <div class="social-links">
                         <a href="#" class="social-link" title="Twitter">🐦</a>
                         <a href="#" class="social-link" title="Facebook">📘</a>

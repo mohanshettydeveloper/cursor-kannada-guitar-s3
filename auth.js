@@ -43,37 +43,8 @@ function logout() {
 // Update navigation based on login status
 function updateNavigation() {
     const accountDropdown = document.querySelector('.nav-dropdown.account-dropdown');
-    if (!accountDropdown) return;
-    
-    const dropdownMenu = accountDropdown.querySelector('.dropdown-menu');
-    if (!dropdownMenu) return;
-    
-    const user = getCurrentUser();
-    
-    if (user) {
-        // User is logged in - show Logout and Profile
-        dropdownMenu.innerHTML = `
-            <li><a href="profile.html" class="dropdown-link">👤 Profile</a></li>
-            <li><a href="#" class="dropdown-link" onclick="event.preventDefault(); logout(); return false;">🚪 Logout</a></li>
-        `;
-        
-        // Update dropdown trigger text
-        const dropdownTrigger = accountDropdown.querySelector('.nav-link');
-        if (dropdownTrigger) {
-            dropdownTrigger.innerHTML = `👤 ${user.username} ▼`;
-        }
-    } else {
-        // User is not logged in - show Login and Register
-        dropdownMenu.innerHTML = `
-            <li><a href="login.html" class="dropdown-link">🔐 Login</a></li>
-            <li><a href="register.html" class="dropdown-link">📝 Register</a></li>
-        `;
-        
-        // Update dropdown trigger text
-        const dropdownTrigger = accountDropdown.querySelector('.nav-link');
-        if (dropdownTrigger) {
-            dropdownTrigger.innerHTML = `Account ▼`;
-        }
+    if (accountDropdown) {
+        accountDropdown.style.display = 'none';
     }
     
     // Show/hide "Add New Post" and "Create Post" links based on login status
