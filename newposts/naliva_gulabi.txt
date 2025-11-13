@@ -1,0 +1,9 @@
+{
+  "id": "naliva_gulabi",
+  "title": "Naliva Gulabi Hoove – Auto Raja movie song – ನಲಿವ ಗುಲಾಬಿ ಹೂವೆ",
+  "authorName": "Mohan",
+  "content": "Please wait for the tabs, will post it soon.",
+  "youtubeUrl": "https://youtu.be/4Q1eXGZ99tA",
+  "tags": "kannada guitar, movie",
+  "date": "2023-05-28T10:30:00.000Z"
+}

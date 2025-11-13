@@ -185,7 +185,7 @@ class BlogApp {
         }
     }
 
-    renderPosts() {
+    renderPosts(showAll = false) {
         const container = document.getElementById('postsContainer');
         if (!container) return;
         
@@ -207,9 +207,9 @@ class BlogApp {
             return;
         }
 
-        const visiblePosts = sortedPosts.slice(0, 3);
+        const visiblePosts = showAll ? sortedPosts : sortedPosts.slice(0, 3);
         const postsHtml = visiblePosts.map(post => this.createPostHTML(post)).join('');
-        const archiveNote = sortedPosts.length > visiblePosts.length
+        const archiveNote = !showAll && sortedPosts.length > visiblePosts.length
             ? `<div class="more-posts-note">Looking for older posts? Browse the archive by month to find the rest.</div>`
             : '';
 
@@ -623,26 +623,63 @@ class BlogApp {
         }).join('');
 
         archivesContainer.innerHTML = archiveMarkup;
+        
+        // Reset the bound flag so event listeners can be re-attached
+        if (archivesContainer.dataset.bound === 'true') {
+            archivesContainer.dataset.bound = 'false';
+        }
+        
+        // Set up archive interactions after rendering
+        if (typeof setupArchiveInteractions === 'function') {
+            setupArchiveInteractions();
+        }
     }
 
     scrollToPost(postId) {
         if (!postId) return;
-        const postElement = document.querySelector(`.post-card[data-id="${postId}"]`);
-
-        if (postElement) {
-            postElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            if (postElement._highlightTimeout) {
-                clearTimeout(postElement._highlightTimeout);
+        
+        // First check if the post is already rendered
+        let postElement = document.querySelector(`.post-card[data-id="${postId}"]`);
+        
+        // If post is not found, render all posts first
+        if (!postElement) {
+            // Find the post in the posts array
+            const targetPost = this.posts.find(post => post.id === postId);
+            if (targetPost) {
+                // Render all posts so the target post becomes visible
+                this.renderPosts(true);
+                // Wait for DOM to update, then find the element
+                setTimeout(() => {
+                    postElement = document.querySelector(`.post-card[data-id="${postId}"]`);
+                    if (postElement) {
+                        this.highlightAndScrollToPost(postElement);
+                    }
+                }, 100);
+                return;
+            } else {
+                // Post doesn't exist
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
             }
-            postElement.classList.add('highlight');
-            postElement._highlightTimeout = setTimeout(() => {
-                postElement.classList.remove('highlight');
-                postElement._highlightTimeout = null;
-            }, 2000);
-        } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        
+        // Post is already visible, just scroll to it
+        this.highlightAndScrollToPost(postElement);
+    }
+    
+    highlightAndScrollToPost(postElement) {
+        if (!postElement) return;
+        
+        postElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (postElement._highlightTimeout) {
+            clearTimeout(postElement._highlightTimeout);
+        }
+        postElement.classList.add('highlight');
+        postElement._highlightTimeout = setTimeout(() => {
+            postElement.classList.remove('highlight');
+            postElement._highlightTimeout = null;
+        }, 2000);
     }
 
     // Navigation handling

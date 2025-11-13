@@ -1,0 +1,9 @@
+{
+  "id": "neera_bittu",
+  "title": "Neera Bittu Nelada Mele – Kannada Guitar Tabs",
+  "authorName": "Mohan",
+  "content": "NEERA BITTU NELAVA MELE DHONI SAAGADHU NELAVA BITTU…………..\nE : ———————–1—– ——————————–\nB : —–1—1—1—1-4—4-1- —-1—1—1—1-4-1-4-1—-\nG : 0-3—3—3—3————- 0-3—3—3—3————-3-\nNINNA BITTU NANNA NANNA BITTU NINNA JEEVANAAA SAAGADHU\nG : 3-3-2—1-0- 3-3-2—1-0- –3-2- -0-1-0-\nD : ——-3—– ——-3—– 1—— ——–\n(REPEAT above line one more time)\nSOORYA BARADHE KAMALA…… CHANDRANIRADE TAARE……..\nE : ————————– —–1—1—1————\nB : 1-1-1-1-1-4-3-1-3-3-3- —3—3—3—3-4-4-4—\nG : ————————– 3————————–\n( REPEAT above line one more time)\nOLAVU MOODADIRALU……….\nB : 1-1-1-4-3- -1-1-1-3———–\nG : ———— ———–0-3-3-3-\nMANAVU ARALADHIRALU……..\nB : ——————-3-3-1- ————————–\nG : –0-3-0-3-0-3-0——— -3-3-2—1-1-0—0——\nD : 3————————- ——–3——–1—3-1-\nNEERA BITTU NELAVA MELE DHONI SAAGADHU NELAVA BITTU…………..\nE : ———————–1—– ——————————–\nB : —–1—1—1—1-4—4-1- —-1—1—1—1-4-1-4-1—-\n\nG : 0-3—3—3—3————- 0-3—3—3—3————-3-\nNINNA BITTU NANNA NANNA BITTU NINNA JEEVANAAA SAAGADHU\nG : 3-3-2—1-0- 3-3-2—1-0- –3-2- -0-1-0-\nD : ——-3—– ——-3—– 1—— ——–\nNEERA BITTU\nE : ———————–1—–\nB : —–1—1—1—1-4—4-1-\nG : 0-3—3—3—3————-\nREPEAT the whole song again from Beginning",
+  "youtubeUrl": "",
+  "tags": "kannada guitar, movie",
+  "date": "2020-08-14T10:30:00.000Z"
+}

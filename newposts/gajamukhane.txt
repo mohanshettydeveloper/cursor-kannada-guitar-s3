@@ -1,0 +1,9 @@
+{
+  "id": "gajamukhane",
+  "title": "Gajamukhane Ganapathiye kannada guitar tabs – ಗಜಮುಖನೇ ಗಣಪತಿಯೇ",
+  "authorName": "Mohan",
+  "content": "Gajamukhane Ganapathiye Ninage Vandhane\nPlay below line 2 times\nCCCCC – CCDCC – CDC B- CD—–\nNambidhavara Paalina Kalpatharu Neene\nD-E DDE FAGFE-D-E DC-B-C—\nPlay below line 2 times/per the song\nG-G-E- G – GG – – G – B ABA G/F# —\nF#AF#E-EF#ED-D-BD-DE—–\nA – A – G – B – A A – – G AG E – C D – D —-\nD- D DB – BDE GG -E- D E -D C – – – – –",
+  "youtubeUrl": "https://youtu.be/kW03JmHeAwM",
+  "tags": "kannada guitar, devotional",
+  "date": "2024-09-06T10:30:00.000Z"
+}

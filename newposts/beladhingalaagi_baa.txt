@@ -1,0 +1,9 @@
+{
+  "id": "beladhingalagi_baa",
+  "title": "Beladingalagi Baa : Movie – Huliya Haalina Mevu, Dr Raj Kumar",
+  "authorName": "Mohan",
+  "content": "I have played in E scale (it’s in Lydian aka Kaylani raaga).\nYou may try in D scale as well.\nBeladingalagi Baa\nE——————————————————————————————-\nB——————————————————————————————-\nG-9/8-11-11-11-11——————————————————————\nBeladingalagi Baa, Thangaliyagi Naanu\nE——————————————— 9-9-9———————————-\nB———————9-9-12————12 9—————————\nG-9/8-11-11-11-11————————— ———-11———————-\nAanandava Needuve, Ondhaguve\nE—————————-9————————————————————\nB———————9-12–—12-10-9———————————————\nG9/8-11-11-11————————————————————————\nRepeat above 2 lines one time\nKannalli Thumbi Cheluva, Manadalli Thumdi Olava\nE-12-12-11-11-9-9————————-—9-9——————————\nB—————————-12-9— 9-9-11-11——-11-11-9——————\nG———————————————————————————————\nRepeat above line 1 time\nBaalalli Thumbidhe, Ullasava\nE———-9-9-9————————————————————————\nB-9-11———————-11-9——————————————————\nG—————————————11-9-9——————————————\nBeladingalagi Baa, Thangaliyagi Naanu\nE——————————————— 9-9-9———————————-\nB———————9-9-12————12 9—————————\nG-9/8-11-11-11-11————————— ———-11———————-\nAanandava Needuve, Ondhaguve\nE—————————-9————————————————————\nB———————9-12–—12-10-9———————————————\nG9/8-11-11-11————————————————————————",
+  "youtubeUrl": "https://youtu.be/xK7vyxPE1Fo",
+  "tags": "kannada guitar, movie",
+  "date": "2022-11-13T10:30:00.000Z"
+}

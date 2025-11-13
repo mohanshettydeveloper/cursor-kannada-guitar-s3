@@ -1,9 +1,9 @@
 {
-  "id": "post-2025-bhavagita",
-  "title": "Bhavageethe Fingerstyle Tutorial",
+  "id": "beduvenu_varavannu",
+  "title": "Beduvenu Varavannu – ಬೇಡುವೆನು ವರವನ್ನು – Jogi Movie",
   "authorName": "Mohan",
-  "content": "In this lesson we’ll break down the bhavageethe fingerstyle",
-  "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "content": "Song is in Harmonic Minor scale(Keeravani Raaga),\nI have simplified the notes (below is the better sounding notes).\nYou can choose to move the scale if you wish or play within the same scale as I did. Played bit faster to keep video short.\n  Beduvenu varavannu kode thayi janmanvanu\n  e|—————————————————————————|\n  B|–8s6-6-66–8–9–8—8s6-6-66——8–9–8——————————–|\n  G|—————————————————————————|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\n  kadethanaka mareyalla jogi kadethanaka mareyalla jogi\n  e|—-8-6-8-6—————————————————————|\n  B|–6———-99–8-6—-8–9—————-8-6-9-8—6–6————|\n  G|———————————8–888———————————–|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\nBhoomi thayiya nodo aaseya hottu dinavu aa surya baruthano oooo hooo\n  e|–13-12–13–8-8—-13-12–13–8-8——-11-10–11–6-6–6–66—–6-9–8–8—-9—|\n  B|—————————————————————8-8———|\n  G|—————————————————————————|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\n  Savi laliya thayi helaya endu dharege aa Chandra baruthano\n  e|–13-12–13–8-8—-13-12–13–8-8——-11-10–11–6-6–6–66—–6-9–8–|\n  B|—————————————————————8-8———|\n  G|—————————————————————————|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\n  Dani keladenu ooo hooo kelayya neenu\n  e|—-8–6-8-6——-8—6——— 8-6-6-8-6——————————–|\n  B|-6———–9–8—————————-9-8—————————|\n  G|—————————————————————————|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\n  Eee thayi ede koogano\n  e|—————————————————————————|\n  B|————8-6–9—8-6—————————————————|\n  G|–8–888——————————————————————-|\n  D|—————————————————————————|\n  A|—————————————————————————|\n  E|—————————————————————————|\n",
+  "youtubeUrl": "https://youtu.be/ahMJCB8YUJY",
   "tags": "kannada guitar, movie",
-  "date": "2025-11-11T10:30:00.000Z"
+  "date": "2025-10-01T10:30:00.000Z"
 }

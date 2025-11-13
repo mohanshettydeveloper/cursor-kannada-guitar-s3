@@ -1,0 +1,9 @@
+{
+  "id": "naguva_nayana",
+  "title": "Naguva Nayana – Kannada Guitar Tabs",
+  "authorName": "Mohan",
+  "content": "Please wait for the tabs, will post it soon.",
+  "youtubeUrl": "https://youtu.be/yQcSzNJZr4I",
+  "tags": "kannada guitar, movie",
+  "date": "2022-07-22T10:30:00.000Z"
+}

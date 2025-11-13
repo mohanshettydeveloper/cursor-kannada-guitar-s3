@@ -1,0 +1,9 @@
+{
+  "id": "dhoni_saagali",
+  "title": "Doni Saagali Munde Hogali Songs – Kannada Guitar Tabs",
+  "authorName": "Mohan",
+  "content": "DONI SAGALI MUNDE HOGALI\n————————————————————\nG——5–7————————————-|\nB–6———–6–66——-6–5—-8–6–6–|\nE————————————————-|\nG———————————|\nB—————8–6–8–6–8–|\nE–5—8–5———————|\nG—————————————-7–7———-5—7——————–7——|\nB——–8——–66——-8–6–8————-6——————-8–6–8——–6-|\nE–5——–5—————————————————-5———————–|",
+  "youtubeUrl": "https://www.facebook.com/mohankmshetty/videos/10211182194384544",
+  "tags": "kannada guitar, movie",
+  "date": "2020-05-02T10:30:00.000Z"
+}
