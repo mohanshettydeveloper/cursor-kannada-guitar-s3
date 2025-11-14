@@ -218,7 +218,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
     }
     </script>
 </head>
-<body>
+<body class="dark-theme">
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -243,6 +243,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                             <a href="#home" class="nav-link">Posts ▼</a>
                             <ul class="dropdown-menu">
                                 <li><a href="#home" class="dropdown-link">View All Posts</a></li>
+                                <li><a href="index.html#archives" class="dropdown-link">Posts by Month</a></li>
                                 <li class="dropdown-separator"></li>
                             </ul>
                         </li>
@@ -263,7 +264,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                         <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
                         <button class="search-btn" onclick="blogApp.searchPosts()">🔍</button>
                     </div>
-                    <button class="theme-toggle" onclick="blogApp.toggleTheme()" title="Toggle Dark Mode">🌙</button>
+                    <button class="theme-toggle" onclick="blogApp.toggleTheme()" title="Toggle Dark Mode">☀️</button>
                 </div>
             </div>
         </div>
@@ -341,7 +342,7 @@ By creating a post, you agree to these terms and confirm your content is appropr
                 </div>
                 
                 <!-- Archives Section -->
-                <div class="archive-section">
+                <div class="archive-section" id="archives">
                     <h3>📅 Posts by Month</h3>
                     <div id="archivesList" class="archive-list">
                         <p class="archive-empty">Loading archives…</p>

@@ -21,6 +21,7 @@ function isFacebookVideoUrl(url) {
 class BlogApp {
     constructor() {
         this.posts = this.loadPosts();
+        this.commentsEnabled = false;
         this.init();
     }
 
@@ -220,7 +221,7 @@ class BlogApp {
         this.renderArchives(sortedPosts);
         
         // Initialize comments for all posts
-        if (window.commentsManager && window.renderComments && window.renderCommentForm) {
+        if (this.commentsEnabled && window.commentsManager && window.renderComments && window.renderCommentForm) {
             visiblePosts.forEach(post => {
                 window.renderComments(post.id);
                 window.renderCommentForm(post.id);
@@ -249,8 +250,29 @@ class BlogApp {
         // Create link to individual post HTML file if it exists
         const postLink = post.htmlFile ? `<a href="${post.htmlFile}" class="post-link" target="_blank">📄 View Full Post</a>` : '';
 
-        // Get comment count
-        const commentCount = window.commentsManager ? window.commentsManager.getCommentCount(post.id) : 0;
+        let commentsMarkup = '';
+        if (this.commentsEnabled) {
+            const commentCount = window.commentsManager ? window.commentsManager.getCommentCount(post.id) : 0;
+            commentsMarkup = `
+                <div class="post-actions">
+                    ${postLink}
+                    <button class="comment-toggle-btn" onclick="toggleComments('${post.id}')" aria-label="Toggle comments">
+                        💬 <span data-comment-count="${post.id}">${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}</span>
+                    </button>
+                </div>
+                
+                <div class="comments-section" id="comments-section-${post.id}" style="display: none;">
+                    <div class="comment-form-container" id="comment-form-container-${post.id}"></div>
+                    <div class="comments-container" id="comments-container-${post.id}"></div>
+                </div>
+            `;
+        } else {
+            commentsMarkup = `
+                <div class="post-actions">
+                    ${postLink}
+                </div>
+            `;
+        }
 
         return `
             <article class="post-card" data-id="${post.id}">
@@ -269,17 +291,7 @@ class BlogApp {
                 
                 ${tagsHTML}
                 
-                <div class="post-actions">
-                    ${postLink}
-                    <button class="comment-toggle-btn" onclick="toggleComments('${post.id}')" aria-label="Toggle comments">
-                        💬 <span data-comment-count="${post.id}">${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}</span>
-                    </button>
-                </div>
-                
-                <div class="comments-section" id="comments-section-${post.id}" style="display: none;">
-                    <div class="comment-form-container" id="comment-form-container-${post.id}"></div>
-                    <div class="comments-container" id="comments-container-${post.id}"></div>
-                </div>
+                ${commentsMarkup}
             </article>
         `;
     }
@@ -769,27 +781,37 @@ class BlogApp {
     toggleTheme() {
         const body = document.body;
         const isDark = body.classList.contains('dark-theme');
+        const themeToggle = document.querySelector('.theme-toggle');
         
         if (isDark) {
             body.classList.remove('dark-theme');
             localStorage.setItem('theme', 'light');
-            document.querySelector('.theme-toggle').textContent = '🌙';
+            if (themeToggle) {
+                themeToggle.textContent = '🌙';
+            }
         } else {
             body.classList.add('dark-theme');
             localStorage.setItem('theme', 'dark');
-            document.querySelector('.theme-toggle').textContent = '☀️';
+            if (themeToggle) {
+                themeToggle.textContent = '☀️';
+            }
         }
     }
 
     loadTheme() {
         const savedTheme = localStorage.getItem('theme');
+        const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
+        if (!savedTheme) {
+            localStorage.setItem('theme', initialTheme);
+        }
+
         const themeToggle = document.querySelector('.theme-toggle');
-        
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-            themeToggle.textContent = '☀️';
-        } else {
-            themeToggle.textContent = '🌙';
+        const isDark = initialTheme === 'dark';
+
+        document.body.classList.toggle('dark-theme', isDark);
+
+        if (themeToggle) {
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
         }
     }
 
@@ -1409,7 +1431,7 @@ function getPostTemplate() {
         }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -1437,7 +1459,7 @@ function getPostTemplate() {
                         <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
                         <button class="search-btn" onclick="window.location.href='../index.html'">🔍</button>
                     </div>
-                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">☀️</button>
                 </div>
             </div>
         </div>
@@ -1530,29 +1552,31 @@ function getPostTemplate() {
         // Theme toggle functionality
         function toggleTheme() {
             const body = document.body;
-            const isDark = body.classList.contains('dark-theme');
-            
-            if (isDark) {
-                body.classList.remove('dark-theme');
-                localStorage.setItem('theme', 'light');
-                document.querySelector('.theme-toggle').textContent = '🌙';
-            } else {
-                body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark');
-                document.querySelector('.theme-toggle').textContent = '☀️';
+            const willBeDark = !body.classList.contains('dark-theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            body.classList.toggle('dark-theme', willBeDark);
+            localStorage.setItem('theme', willBeDark ? 'dark' : 'light');
+
+            if (themeToggle) {
+                themeToggle.textContent = willBeDark ? '☀️' : '🌙';
             }
         }
 
         // Load saved theme
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
+            const initialTheme = savedTheme === 'light' ? 'light' : 'dark';
+            if (!savedTheme) {
+                localStorage.setItem('theme', initialTheme);
+            }
+
+            const isDark = initialTheme === 'dark';
+            document.body.classList.toggle('dark-theme', isDark);
+
             const themeToggle = document.querySelector('.theme-toggle');
-            
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-                themeToggle.textContent = '☀️';
-            } else {
-                themeToggle.textContent = '🌙';
+            if (themeToggle) {
+                themeToggle.textContent = isDark ? '☀️' : '🌙';
             }
         });
     </script>
