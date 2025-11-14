@@ -2876,6 +2876,27 @@ body:has(.about-section) .main,
     color: var(--accent);
 }
 
+.email-address-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    transition: color 0.3s ease;
+}
+
+.email-address-link:hover {
+    color: var(--primary-light);
+}
+
+.dark-theme .email-address-link {
+    color: var(--accent);
+}
+
+.dark-theme .email-address-link:hover {
+    color: var(--accent-light);
+}
+
 .contact-form-container h3 {
     color: var(--primary);
     font-size: 1.8rem;

@@ -229,7 +229,7 @@ Based on similar music community websites:
 ## 📧 Support
 
 For technical support or questions about revenue setup:
-- Email: kannadaguitarcom@gmail.com
+- Email: [kannadaguitarcom@gmail.com](mailto:kannadaguitarcom@gmail.com)
 - Website: https://kannadaguitar.com
 
 ---

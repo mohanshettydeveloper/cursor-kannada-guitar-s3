@@ -244,7 +244,7 @@ Solution: Clear browser cache or wait for CloudFront cache to expire
 - AWS Support Center: [console.aws.amazon.com/support](https://console.aws.amazon.com/support)
 
 ### Website Support
-- Email: kannadaguitarcom@gmail.com
+- Email: [kannadaguitarcom@gmail.com](mailto:kannadaguitarcom@gmail.com)
 - GitHub Issues: [Create an issue](https://github.com/your-repo/issues)
 
 ## 🎉 Success Checklist

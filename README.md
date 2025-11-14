@@ -171,7 +171,7 @@ We welcome contributions to improve the Kannada guitar community:
 
 ## 📞 Support
 
-- **Email**: kannadaguitarcom@gmail.com
+- **Email**: [kannadaguitarcom@gmail.com](mailto:kannadaguitarcom@gmail.com)
 - **Website**: https://kannadaguitar.com
 - **Issues**: Create an issue on GitHub
 
