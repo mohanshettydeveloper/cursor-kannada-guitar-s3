@@ -1,0 +1,9 @@
+{
+  "id": "huvindha hoovige",
+  "title": "Huvindha Hoovige Haaruva Dumbi – ಹೂವಿಂದ ಹೂವಿಗೆ ಹಾರುವ ದುಂಬಿ",
+  "authorName": "Mohan",
+  "content": "Please wait for the tabs, will post it shortly",
+  "youtubeUrl": "https://youtu.be/vtsAIngw_4I",
+  "tags": "kannada guitar, movie",
+  "date": "2025-07-25T10:30:00.000Z"
+}
