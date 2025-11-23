@@ -54,7 +54,7 @@
                         <div class="music-icon">🎸</div>
                         <h1 class="blog-title">ಕನ್ನಡ ಗಿಟಾರ್</h1>
                     </div>
-                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಹೆಮ್ಮೆಯ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
+                    <p class="blog-subtitle">ಪ್ರೀತಿಯಿಂದ ಕನ್ನಡಿಗರಿಗಾಗಿ</p>
                 </div>
                 
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
@@ -75,8 +75,8 @@
                 
                 <div class="header-actions">
                     <div class="search-container">
-                        <input type="text" id="searchInput" placeholder="Search posts..." class="search-input">
-                        <button class="search-btn" onclick="window.location.href='index.html'">🔍</button>
+                        <input type="text" id="searchInput" placeholder="Search ..." class="search-input">
+                        <button class="search-btn" onclick="handleSearchRedirect()">🔍</button>
                     </div>
                     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">☀️</button>
                 </div>
@@ -251,6 +251,29 @@
             const themeToggle = document.querySelector('.theme-toggle');
             if (themeToggle) {
                 themeToggle.textContent = isDark ? '☀️' : '🌙';
+            }
+        });
+
+        // Handle search redirect to index.html with search query
+        function handleSearchRedirect() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput ? searchInput.value.trim() : '';
+            if (query) {
+                window.location.href = `index.html?search=${encodeURIComponent(query)}`;
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Allow Enter key to trigger search
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleSearchRedirect();
+                    }
+                });
             }
         });
     </script>

@@ -850,6 +850,14 @@ class BlogApp {
                     dropdown.classList.remove('active');
                 }
             });
+            
+            // Close dropdown when a dropdown option is selected (using event delegation for dynamically added links)
+            dropdownMenu.addEventListener('click', (e) => {
+                if (e.target.classList.contains('dropdown-link') || e.target.closest('.dropdown-link')) {
+                    dropdownMenu.style.display = 'none';
+                    dropdown.classList.remove('active');
+                }
+            });
         }
     }
 
@@ -978,6 +986,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Make blogApp available globally
     window.blogApp = blogApp;
+    
+    // Check for search query in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        // Set the search input value
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = searchQuery;
+        }
+        // Execute the search
+        blogApp.handleSearch(searchQuery);
+        // Scroll to posts section
+        setTimeout(() => {
+            const postsSection = document.getElementById('home');
+            if (postsSection) {
+                postsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
     
     // Load post navigation from localStorage
     loadPostNavigation();
