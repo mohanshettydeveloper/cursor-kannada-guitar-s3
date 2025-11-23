@@ -539,26 +539,62 @@ By creating a post, you agree to these terms and confirm your content is appropr
     <script src="cookie-consent.js"></script>
     <script src="script.js"></script>
     <script>
+        // Safe AdSense initialization - only for visible ad containers
+        function initializeVisibleAdSense() {
+            if (typeof adsbygoogle === 'undefined') {
+                return; // AdSense script not loaded
+            }
+
+            // Find all visible ad containers
+            const adContainers = document.querySelectorAll('.ad-container');
+            let visibleAdCount = 0;
+
+            adContainers.forEach(function(container) {
+                const style = window.getComputedStyle(container);
+                const isVisible = style.display !== 'none' && 
+                                 style.visibility !== 'hidden' && 
+                                 container.offsetWidth > 0 &&
+                                 container.offsetHeight > 0;
+
+                if (isVisible) {
+                    const adUnit = container.querySelector('ins.adsbygoogle');
+                    if (adUnit && !adUnit.dataset.adsbygoogleStatus) {
+                        try {
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                            visibleAdCount++;
+                        } catch (e) {
+                            console.error('Error initializing AdSense:', e);
+                        }
+                    }
+                }
+            });
+
+            if (visibleAdCount > 0) {
+                console.log('Initialized ' + visibleAdCount + ' visible AdSense ad(s)');
+            } else {
+                console.log('No visible ad containers found. AdSense initialization skipped.');
+            }
+        }
+
         // Initialize AdSense ads only after cookie consent
         window.addEventListener('cookieConsentChanged', function(e) {
-            if (e.detail.type === 'all' && typeof adsbygoogle !== 'undefined') {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
+            if (e.detail.type === 'all') {
+                // Use the cookie consent's initializeAdSense function
+                if (window.CookieConsent && typeof window.CookieConsent.initializeAdSense === 'function') {
+                    window.CookieConsent.initializeAdSense();
+                } else {
+                    // Fallback: initialize visible ads
+                    setTimeout(initializeVisibleAdSense, 100);
+                }
             }
         });
 
         // Check existing consent and initialize if already accepted
         document.addEventListener('DOMContentLoaded', function() {
             const consent = window.CookieConsent ? window.CookieConsent.getStatus() : null;
-            if (consent === 'accepted' && typeof adsbygoogle !== 'undefined') {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                (adsbygoogle = window.adsbygoogle || []).push({});
+            if (consent === 'accepted') {
+                // Delay slightly to ensure DOM is fully ready
+                setTimeout(initializeVisibleAdSense, 200);
             }
         });
     </script>

@@ -44,13 +44,13 @@
                     <a href="privacy-policy.html#cookie-policy" target="_blank">Learn more about our Cookie Policy</a>.</p>
                 </div>
                 <div class="cookie-consent-actions">
-                    <button id="cookieAcceptAll" class="cookie-btn cookie-btn-accept" aria-label="Accept all cookies">
+                    <button type="button" id="cookieAcceptAll" class="cookie-btn cookie-btn-accept" aria-label="Accept all cookies">
                         Accept All
                     </button>
-                    <button id="cookieAcceptEssential" class="cookie-btn cookie-btn-essential" aria-label="Accept essential cookies only">
+                    <button type="button" id="cookieAcceptEssential" class="cookie-btn cookie-btn-essential" aria-label="Accept essential cookies only">
                         Essential Only
                     </button>
-                    <button id="cookieDecline" class="cookie-btn cookie-btn-decline" aria-label="Decline cookies">
+                    <button type="button" id="cookieDecline" class="cookie-btn cookie-btn-decline" aria-label="Decline cookies">
                         Decline
                     </button>
                 </div>
@@ -60,37 +60,62 @@
         // Add banner to body
         document.body.appendChild(banner);
 
-        // Add event listeners using event delegation for reliability
-        setupCookieListeners(banner);
+        // Wait for DOM to be ready, then setup listeners
+        setTimeout(function() {
+            setupCookieListeners(banner);
+        }, 10);
     }
 
-    // Setup event listeners for cookie consent buttons using event delegation
+    // Setup event listeners for cookie consent buttons
     function setupCookieListeners(banner) {
-        // Use event delegation - attach listener to banner and check which button was clicked
-        banner.addEventListener('click', function(e) {
-            const target = e.target;
-            
-            // Check if clicked element is a button or inside a button
-            if (target.id === 'cookieAcceptAll' || target.closest('#cookieAcceptAll')) {
+        // Get buttons directly from the banner element
+        const acceptAllBtn = banner.querySelector('#cookieAcceptAll');
+        const acceptEssentialBtn = banner.querySelector('#cookieAcceptEssential');
+        const declineBtn = banner.querySelector('#cookieDecline');
+
+        // Direct event listeners on each button using addEventListener for better reliability
+        if (acceptAllBtn) {
+            // Remove any existing listeners
+            acceptAllBtn.replaceWith(acceptAllBtn.cloneNode(true));
+            const newAcceptBtn = banner.querySelector('#cookieAcceptAll');
+            newAcceptBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Accept All button clicked');
                 acceptCookies('all');
                 hideBanner(banner);
                 return false;
-            } else if (target.id === 'cookieAcceptEssential' || target.closest('#cookieAcceptEssential')) {
+            }, { once: true }); // Only fire once
+        }
+
+        if (acceptEssentialBtn) {
+            acceptEssentialBtn.replaceWith(acceptEssentialBtn.cloneNode(true));
+            const newEssentialBtn = banner.querySelector('#cookieAcceptEssential');
+            newEssentialBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Essential Only button clicked');
                 acceptCookies('essential');
                 hideBanner(banner);
                 return false;
-            } else if (target.id === 'cookieDecline' || target.closest('#cookieDecline')) {
+            }, { once: true });
+        }
+
+        if (declineBtn) {
+            declineBtn.replaceWith(declineBtn.cloneNode(true));
+            const newDeclineBtn = banner.querySelector('#cookieDecline');
+            newDeclineBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Decline button clicked');
                 declineCookies();
                 hideBanner(banner);
                 return false;
-            }
-        });
+            }, { once: true });
+        }
     }
 
     // Accept cookies
@@ -135,49 +160,122 @@
 
     // Hide banner with animation
     function hideBanner(banner) {
+        console.log('hideBanner called', banner);
+        
+        // Find banner if not provided
         if (!banner) {
-            // Try to find banner by ID if not provided
             banner = document.getElementById('cookieConsentBanner');
-            if (!banner) return;
+        }
+        
+        if (!banner) {
+            console.warn('Banner not found to hide');
+            return;
         }
         
         // Prevent multiple clicks from trying to hide multiple times
-        if (banner.classList.contains('cookie-consent-banner-hiding')) {
+        if (banner.classList.contains('cookie-consent-banner-hiding') || banner.style.display === 'none') {
+            console.log('Banner already hiding');
             return; // Already hiding
         }
+        
+        console.log('Starting banner hide animation');
         
         // Add hiding class for animation
         banner.classList.add('cookie-consent-banner-hiding');
         
-        // Remove banner after animation completes
+        // Immediately hide it visually
+        banner.style.opacity = '0';
+        banner.style.pointerEvents = 'none';
+        banner.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+        
+        // Remove banner from DOM after a short delay
         setTimeout(function() {
             try {
-                // Try multiple methods to ensure removal
                 const bannerToRemove = document.getElementById('cookieConsentBanner');
                 if (bannerToRemove) {
-                    if (bannerToRemove.parentNode) {
-                        bannerToRemove.parentNode.removeChild(bannerToRemove);
-                    } else {
-                        bannerToRemove.remove();
-                    }
+                    console.log('Removing banner from DOM');
+                    
+                    // Add final transform to slide it down
+                    bannerToRemove.style.transform = 'translateY(100%)';
+                    
+                    // Wait a bit more then remove
+                    setTimeout(function() {
+                        try {
+                            const finalBanner = document.getElementById('cookieConsentBanner');
+                            if (finalBanner) {
+                                if (finalBanner.remove) {
+                                    finalBanner.remove();
+                                } else if (finalBanner.parentNode) {
+                                    finalBanner.parentNode.removeChild(finalBanner);
+                                }
+                                console.log('Banner removed successfully');
+                            }
+                        } catch (err) {
+                            console.error('Error in final removal:', err);
+                            // Last resort - hide with CSS
+                            const fallbackBanner = document.getElementById('cookieConsentBanner');
+                            if (fallbackBanner) {
+                                fallbackBanner.style.display = 'none';
+                                fallbackBanner.style.visibility = 'hidden';
+                                fallbackBanner.style.position = 'fixed';
+                                fallbackBanner.style.bottom = '-1000px';
+                            }
+                        }
+                    }, 50);
+                } else {
+                    console.log('Banner already removed');
                 }
             } catch (e) {
                 console.error('Error removing cookie banner:', e);
-                // Fallback: just hide it with CSS
+                // Final fallback: just hide it with CSS
                 const bannerFallback = document.getElementById('cookieConsentBanner');
                 if (bannerFallback) {
                     bannerFallback.style.display = 'none';
+                    bannerFallback.style.visibility = 'hidden';
+                    bannerFallback.style.position = 'fixed';
+                    bannerFallback.style.bottom = '-1000px';
                 }
             }
-        }, 350); // Slightly longer than animation duration (300ms)
+        }, 300); // Wait for animation to start
     }
 
     // Initialize AdSense if consent given
     function initializeAdSense() {
         // Check if AdSense script is already loaded
-        if (typeof adsbygoogle !== 'undefined') {
-            // Push ad units to initialize
-            (adsbygoogle = window.adsbygoogle || []).push({});
+        if (typeof adsbygoogle === 'undefined') {
+            console.log('AdSense script not loaded yet');
+            return;
+        }
+
+        // Only initialize ads for visible ad containers
+        // Check if any ad containers are visible before initializing
+        const adContainers = document.querySelectorAll('.ad-container');
+        let hasVisibleAds = false;
+
+        adContainers.forEach(function(container) {
+            const style = window.getComputedStyle(container);
+            const isVisible = style.display !== 'none' && 
+                             style.visibility !== 'hidden' && 
+                             container.offsetWidth > 0 &&
+                             container.offsetHeight > 0;
+
+            if (isVisible) {
+                hasVisibleAds = true;
+                // Initialize only this visible ad container
+                const adUnit = container.querySelector('ins.adsbygoogle');
+                if (adUnit) {
+                    try {
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                        console.log('AdSense initialized for visible ad container');
+                    } catch (e) {
+                        console.error('Error initializing AdSense for ad unit:', e);
+                    }
+                }
+            }
+        });
+
+        if (!hasVisibleAds) {
+            console.log('No visible ad containers found. AdSense initialization skipped.');
         }
     }
 
@@ -227,6 +325,7 @@
         accept: acceptCookies,
         decline: declineCookies,
         getStatus: getCookieConsent,
+        initializeAdSense: initializeAdSense,
         reset: function() {
             localStorage.removeItem(COOKIE_CONSENT_KEY);
             createCookieBanner();
