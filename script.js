@@ -335,8 +335,7 @@ class BlogApp {
                     src="${embedUrl}" 
                     title="YouTube video player" 
                     frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-                    allowfullscreen>
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen">
                 </iframe>
             </div>
         `;
@@ -402,8 +401,7 @@ class BlogApp {
                     src="${embedUrl}" 
                     title="Facebook video player" 
                     frameborder="0" 
-                    allow="encrypted-media" 
-                    allowfullscreen
+                    allow="encrypted-media; fullscreen"
                     scrolling="no"
                     style="max-width: 100%; width: 100%; border: none; overflow: hidden;">
                 </iframe>
@@ -1207,6 +1205,8 @@ function getPostTemplate() {
     <meta name="msapplication-TileColor" content="#d7263d">
     <meta name="application-name" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Legacy support for older iOS devices -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     

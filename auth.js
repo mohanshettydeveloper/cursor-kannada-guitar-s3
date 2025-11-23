@@ -42,6 +42,7 @@ function logout() {
 
 // Update navigation based on login status
 function updateNavigation() {
+    const user = getCurrentUser(); // Get the current user
     const accountDropdown = document.querySelector('.nav-dropdown.account-dropdown');
     if (accountDropdown) {
         accountDropdown.style.display = 'none';

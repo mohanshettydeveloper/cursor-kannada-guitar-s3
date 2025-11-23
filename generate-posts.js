@@ -99,6 +99,8 @@ function getPostTemplate() {
     <meta name="msapplication-TileColor" content="#d7263d">
     <meta name="application-name" content="Kannada Guitar">
     <meta name="apple-mobile-web-app-title" content="Kannada Guitar">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- Legacy support for older iOS devices -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
