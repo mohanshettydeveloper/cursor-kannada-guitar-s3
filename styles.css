@@ -1742,37 +1742,58 @@ body::before {
         flex: 1;
         min-width: 0;
         max-width: calc(100% - 60px); /* Prevent overlap with menu toggle */
-        overflow: hidden;
         padding-right: 10px; /* Extra padding to prevent text touching search */
-        gap: 0.25rem; /* Space between title and subtitle */
+        gap: 0.35rem; /* Space between title and subtitle */
         display: flex;
         flex-direction: column;
+        overflow: visible; /* Allow text to be visible */
     }
     
     .logo-container {
-        margin-bottom: 0.25rem; /* Space between title container and subtitle */
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        overflow: visible;
     }
     
     .blog-title {
         font-size: 1.4rem;
+        font-weight: 700;
         white-space: nowrap;
-        margin-bottom: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        line-height: 1.6; /* Tighter line height */
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
         display: block;
+        overflow: visible;
+        max-width: 100%;
+        /* Ensure gradient text is visible */
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 60%, #fff6b0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support gradients */
+        color: var(--accent);
     }
     
     .blog-subtitle {
         font-size: 0.85rem;
-        margin-top: 0;
-        margin-bottom: 0;
-        line-height: 1.3;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
         display: block;
+        overflow: visible;
+        max-width: 100%;
+        /* Ensure gradient text is visible */
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 40%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support gradients */
+        color: var(--primary-light);
     }
     
     .main-nav {
@@ -1970,15 +1991,20 @@ body::before {
     
     .logo-section {
         max-width: calc(100% - 60px); /* Prevent overlap with menu toggle */
-        overflow: hidden;
         padding-right: 10px;
-        gap: 0.25rem; /* Space between title and subtitle */
+        gap: 0.35rem; /* Space between title and subtitle */
         display: flex;
         flex-direction: column;
+        overflow: visible; /* Allow text to be visible */
     }
     
     .logo-container {
-        margin-bottom: 0.25rem; /* Space between title container and subtitle */
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        overflow: visible;
     }
     
     .main-nav {
@@ -1987,24 +2013,40 @@ body::before {
     
     .blog-title {
         font-size: 1.3rem;
-        margin-bottom: 0;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
         white-space: nowrap;
-        line-height: 1.3;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
+        line-height: 1.4;
         display: block;
+        overflow: visible;
+        max-width: 100%;
+        /* Ensure gradient text is visible */
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 60%, #fff6b0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support gradients */
+        color: var(--accent);
     }
     
     .blog-subtitle {
         font-size: 0.8rem;
-        margin-top: 0;
-        margin-bottom: 0;
-        line-height: 1.3;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
         display: block;
+        overflow: visible;
+        max-width: 100%;
+        /* Ensure gradient text is visible */
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 40%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support gradients */
+        color: var(--primary-light);
     }
     
     .header-content {
