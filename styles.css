@@ -113,6 +113,21 @@ body::before {
     padding: 0 20px;
 }
 
+/* Desktop container improvements */
+@media (min-width: 1441px) {
+    .container {
+        max-width: 1400px;
+        padding: 0 40px;
+    }
+}
+
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1600px;
+        padding: 0 60px;
+    }
+}
+
 
 /* Header Styles */
 .header {
@@ -681,14 +696,34 @@ body::before {
 .main {
     padding: 3rem 0;
     display: grid;
-    grid-template-columns: minmax(0, 0.6fr) 260px;
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+    gap: 2rem;
     align-items: start;
     background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     margin: 2rem 0;
     padding: 2.25rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Desktop responsiveness improvements */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .main {
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+        gap: 1.75rem;
+        padding: 2rem;
+    }
+}
+
+@media (min-width: 1441px) {
+    .main {
+        grid-template-columns: minmax(0, 1.2fr) minmax(300px, 350px);
+        gap: 2.5rem;
+        padding: 2.5rem;
+    }
 }
 
 /* Ad Container Styles */
@@ -714,6 +749,14 @@ body::before {
     position: sticky;
     top: 100px;
     height: fit-content;
+    max-width: 100%;
+}
+
+/* Desktop sidebar improvements */
+@media (min-width: 769px) {
+    .ad-sidebar {
+        max-width: 320px;
+    }
 }
 
 .ad-sidebar-content {
@@ -1003,7 +1046,22 @@ body::before {
 
 .posts-container {
     display: grid;
+    grid-template-columns: 1fr;
     gap: 2rem;
+}
+
+/* Desktop posts container optimization */
+@media (min-width: 769px) {
+    .posts-container {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    .posts-container {
+        gap: 3rem;
+    }
 }
 
 .post-card {
@@ -1093,12 +1151,93 @@ body::before {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+    position: relative;
+    background: #000;
 }
 
 .post-video iframe {
     width: 100%;
     height: 315px;
     border: none;
+    display: block;
+}
+
+/* Desktop video sizing - better aspect ratio */
+@media (min-width: 769px) {
+    .post-video iframe {
+        height: 450px;
+        min-height: 400px;
+    }
+    
+    .lazy-video {
+        padding-bottom: 56.25%; /* Maintain 16:9 aspect ratio */
+    }
+}
+
+@media (min-width: 1025px) {
+    .post-video iframe {
+        height: 500px;
+    }
+}
+
+@media (min-width: 1441px) {
+    .post-video iframe {
+        height: 560px;
+    }
+}
+
+/* Lazy loading video styles */
+.lazy-video {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.video-thumbnail:hover {
+    opacity: 0.9;
+}
+
+.video-play-button {
+    width: 68px;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.video-play-button:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.lazy-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* Instagram video embeds */
@@ -1664,6 +1803,12 @@ body::before {
         padding: 0 20px;
     }
     
+    .main {
+        grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+    
     .header-content {
         gap: 1rem;
     }
@@ -1682,6 +1827,10 @@ body::before {
     
     .post-card {
         padding: 2rem;
+    }
+    
+    .post-video iframe {
+        height: 400px;
     }
 }
 

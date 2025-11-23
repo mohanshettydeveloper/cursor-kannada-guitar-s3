@@ -220,11 +220,86 @@ class BlogApp {
         this.bindDeleteEvents();
         this.renderArchives(sortedPosts);
         
+        // Initialize lazy loading for videos
+        this.initializeLazyVideos();
+        
         // Initialize comments for all posts
         if (this.commentsEnabled && window.commentsManager && window.renderComments && window.renderCommentForm) {
             visiblePosts.forEach(post => {
                 window.renderComments(post.id);
                 window.renderCommentForm(post.id);
+            });
+        }
+    }
+    
+    // Initialize lazy loading for YouTube videos for better performance
+    initializeLazyVideos() {
+        const lazyVideos = document.querySelectorAll('.lazy-video');
+        
+        lazyVideos.forEach(videoContainer => {
+            const thumbnail = videoContainer.querySelector('.video-thumbnail');
+            if (!thumbnail) return;
+            
+            // Click handler to load video on demand
+            thumbnail.addEventListener('click', function() {
+                const embedUrl = videoContainer.dataset.embedUrl;
+                const videoId = videoContainer.dataset.videoId;
+                if (!embedUrl) return;
+                
+                // Mark as loaded to prevent double-loading
+                videoContainer.classList.add('video-loaded');
+                
+                // Replace thumbnail with iframe (autoplay on click)
+                videoContainer.innerHTML = `
+                    <iframe 
+                        src="${embedUrl}?autoplay=1&rel=0" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                        loading="lazy"
+                        allowfullscreen>
+                    </iframe>
+                `;
+            });
+        });
+        
+        // Intersection Observer for auto-loading videos near viewport (performance optimization)
+        if ('IntersectionObserver' in window) {
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const videoContainer = entry.target;
+                        
+                        // Only auto-load if not already loaded and thumbnail still exists
+                        if (!videoContainer.classList.contains('video-loaded')) {
+                            const thumbnail = videoContainer.querySelector('.video-thumbnail');
+                            if (thumbnail) {
+                                // Auto-load video when it's about to enter viewport (without autoplay)
+                                const embedUrl = videoContainer.dataset.embedUrl;
+                                if (embedUrl) {
+                                    videoContainer.innerHTML = `
+                                        <iframe 
+                                            src="${embedUrl}?rel=0" 
+                                            title="YouTube video player" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                            loading="lazy"
+                                            allowfullscreen>
+                                        </iframe>
+                                    `;
+                                    videoContainer.classList.add('video-loaded');
+                                    videoObserver.unobserve(videoContainer);
+                                }
+                            }
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '100px' // Start loading 100px before video enters viewport for smoother experience
+            });
+            
+            lazyVideos.forEach(video => {
+                videoObserver.observe(video);
             });
         }
     }
@@ -328,15 +403,18 @@ class BlogApp {
         }
 
         const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
         
         return `
-            <div class="post-video">
-                <iframe 
-                    src="${embedUrl}" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen">
-                </iframe>
+            <div class="post-video lazy-video" data-video-id="${videoId}" data-embed-url="${embedUrl}">
+                <div class="video-thumbnail" style="background-image: url('${thumbnailUrl}'); cursor: pointer;">
+                    <div class="video-play-button">
+                        <svg width="68" height="48" viewBox="0 0 68 48">
+                            <path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.63-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"/>
+                            <path d="M 45,24 27,14 27,34" fill="#fff"/>
+                        </svg>
+                    </div>
+                </div>
             </div>
         `;
     }
