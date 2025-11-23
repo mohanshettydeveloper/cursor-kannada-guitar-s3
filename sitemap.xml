@@ -24,7 +24,7 @@
     </url>
     <url>
         <loc>https://kannadaguitar.com/contact.html</loc>
-        <lastmod>2024-01-01</lastmod>
+        <lastmod>2024-12-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
         <image:image>
@@ -32,5 +32,17 @@
             <image:title>Contact Kannada Guitar Community</image:title>
             <image:caption>Get in touch with our Kannada guitar community for support and collaboration</image:caption>
         </image:image>
+    </url>
+    <url>
+        <loc>https://kannadaguitar.com/privacy-policy.html</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://kannadaguitar.com/terms-of-service.html</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.6</priority>
     </url>
 </urlset>

@@ -16,6 +16,8 @@ Disallow: /temp/
 Allow: /index.html
 Allow: /about.html
 Allow: /contact.html
+Allow: /privacy-policy.html
+Allow: /terms-of-service.html
 Allow: /error.html
 Allow: /post-template.html
 Allow: /styles.css
