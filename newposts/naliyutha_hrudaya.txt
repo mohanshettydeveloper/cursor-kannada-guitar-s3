@@ -1,9 +1,9 @@
 {
-  "id": "hosabaalige_nee",
-  "title": "Hosa Baalige Nee Jotheyaadhe- Kannada Guitar Tabs",
+  "id": "naliyutha_hrudaya",
+  "title": "Naliyutha Hrudaya Haadanu Haadidhe- Kannada Guitar Tabs",
   "authorName": "Mohan",
-  "content": "I am playing this in D scale, starting note is F#(Ga). You can move up or down.\nHosa Baalige Nee Jotheyaadhe\nE———————————————————————————\nB——7——9——10——9——7——9——7————7—7—\nG————————————————————9——————\nHosa Aananda Neenindhu Thandhe\nE———————————————————————————\nB———————9–—7——9——7————————————\nG—6——6–—6———————————9—— 7—7—————\nHosa Raaga Hosa Thaala Hosa Bhaava Geetheye Neenaadhe\nE————————————7–7——7—— 7—— 9——10—— 7————————————\nB————————10–—9—————9————————————9—— 10—— 8—— 7—\nG—7s6–—9–—9—————————————————————————————————",
-  "youtubeUrl": "https://youtu.be/M8iBHfXtj5k",
+  "content": "Please wait for the tabs, will upload soon!",
+  "youtubeUrl": "https://youtu.be/JnbH8ja8L4I",
   "tags": "kannada guitar, movie",
-  "date": "2022-05-01T10:30:00.000Z"
+  "date": "2025-12-29T10:30:00.000Z"
 }
